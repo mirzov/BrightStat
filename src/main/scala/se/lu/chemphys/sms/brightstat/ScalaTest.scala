@@ -24,7 +24,8 @@ object ScalaTest extends SimpleSwingApplication{
 	}
 		
 	var image = new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR)
-	val movie = new Movie("/home/oleg/Documents/ChemPhys/BrightStat/tests/test.SPE")
+	private val url = this.getClass.getResource("/test.SPE")
+	val movie = new Movie(url.getFile)
 	
 	val movieScreen = new BorderPanel{
 		border = Swing.BeveledBorder(Swing.Raised)
