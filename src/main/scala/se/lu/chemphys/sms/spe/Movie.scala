@@ -24,7 +24,7 @@ class Movie(filePath: String) {
 
 	val frameLength: Int = XDim * YDim * dataLength
 	
-	def getFrame(n: Int): Frame = {
+	def getFrame(n: Int): SpeFrame = {
 		if(n < 1 || n > Nframes) throw new IndexOutOfBoundsException("A frame number outside of the actual interval has been requested.")
 		val neededPosition = headerLength + (n - 1) * frameLength
 		if(file.position != neededPosition) file.position(neededPosition)
