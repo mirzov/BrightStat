@@ -21,15 +21,17 @@ class MovieShower extends SwingWorker{
 		val totNumPix = image.getHeight * image.getWidth
 		val array = new Array[Int](totNumPix)
 		
+		meter ! "reset"
 		var frNum = 1
 		while(!cancelled && frNum <= movie.Nframes){
-			var frame = movie.getFrame(frNum)
+			var frame = movie.getImageable(frNum)
 			image = frame.getImage
 			movieScreen.repaint
 			frNum = frNum + 1
 			//Thread.sleep(1)
 		}
 		ScalaTest.state ! "pause"
+		meter ! movie.Nframes 
 //		while(!cancelled){
 //			var i = 0
 //			while(i < totNumPix){

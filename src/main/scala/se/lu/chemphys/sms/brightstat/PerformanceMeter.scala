@@ -15,6 +15,7 @@ class PerformanceMeter extends SwingWorker{
 					val performance = count * 1000 / duration
 					perfLabel.text = performance.toString + " fps"
 					startTime = curTime
+				case "reset" => startTime = curTime
 			}
 		}
 	}

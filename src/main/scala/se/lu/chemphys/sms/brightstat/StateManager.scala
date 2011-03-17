@@ -33,7 +33,7 @@ class StateManager extends SwingWorker {
 			movieShower = new MovieShower
 			button.action = startAction
 			resetButton.enabled = true
-			perfLabel.text = "0 fps"
+			//perfLabel.text = "0 fps"
 			react{
 				case "start" =>	movieShower.start(); showing
 				case "reset" => movieShower.clearImage(); initial

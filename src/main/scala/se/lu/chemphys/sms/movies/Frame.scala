@@ -1,14 +1,27 @@
 package se.lu.chemphys.sms.movies
 
-trait Frame[T <: Ordered[T]] {
-	val XDim: Int
-	val YDim: Int
-	def min: T
-	def max: T
-	def sum: T
-	def average: Double
-	def apply(i: Int, j: Int): T
-	def update(i: Int, j: Int, x: T): Unit
+import java.awt.image.BufferedImage
+
+trait Imageable{
+	def getImage : BufferedImage
+}
+
+class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) extends Imageable {
+	import num._
+	val min: T = data.min
+	val max: T = data.max
+	lazy val average: Double = data.map(_.toDouble).sum / XDim / YDim
+	def withinRange(i: Int, j: Int): Boolean = (i >= 0 && j >= 0 && i < XDim && j < YDim)
+	def apply(i: Int, j: Int): T = {
+		assert(withinRange(i, j), "Index is out of range in call to Frame(i, j)")
+		data(j*XDim + i)
+	}
+	
+	def update(i: Int, j: Int, x: T){
+		assert(withinRange(i, j), "Index is out of range in call to Frame(i, j)=")
+		data(j*XDim + i) = x
+	}
+	
 	def isLocalMax(i: Int, j: Int): Boolean = {
 		i > 0 && j > 0 && i < XDim - 1 && j < YDim - 1  && {
 			var i0 = -1;
@@ -22,5 +35,18 @@ trait Frame[T <: Ordered[T]] {
 			}
 			true
 		}
+	}
+	
+	def getImage : BufferedImage = {
+		val image = new BufferedImage(XDim, YDim, BufferedImage.TYPE_3BYTE_BGR)
+		val array = new Array[Int](XDim * YDim)
+		var i = 0
+		while(i < array.length){
+			val ints = ((255 * (data(i) - min).toDouble) / (max - min).toDouble).toInt
+			array(i) = ints + (ints << 8) + (ints << 16)
+			i = i + 1
+		}
+		image.setRGB(0, 0, XDim, YDim, array, 0, XDim)
+		image
 	}
 }

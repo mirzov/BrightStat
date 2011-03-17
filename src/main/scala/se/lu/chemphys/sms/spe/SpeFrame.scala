@@ -3,7 +3,7 @@ package se.lu.chemphys.sms.spe
 
 import java.awt.image.BufferedImage
 
-class SpeFrame (val XDim: Int, val YDim: Int, private val data: Array[Int]) extends Frame[Int] {
+class SpeFrame (val XDim: Int, val YDim: Int, private val data: Array[Int]) {
 	
 	assert(data.length == XDim * YDim, "Wrong length of frame data array, must be XDim*YDim.")
 	assert(XDim > 0 && YDim > 0, "Frame dimensions must be positive")
@@ -43,6 +43,17 @@ object SpeFrame{
 		val imax = array.length
 		while(i < imax){
 			array(i) = (shorts(i*2) & 0x00ff) | (shorts(i*2+1) << 8)
+			i = i + 1
+		}
+		array
+	}
+
+	def shortBytesToShorts(bytes: Array[Byte]): Array[Short] = {
+		val array = new Array[Short](bytes.length / 2)
+		var i = 0;
+		val imax = array.length
+		while(i < imax){
+			array(i) = ((bytes(i*2) & 0x00ff) | (bytes(i*2+1) << 8)).toShort
 			i = i + 1
 		}
 		array
