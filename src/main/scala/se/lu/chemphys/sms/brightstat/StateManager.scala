@@ -1,7 +1,7 @@
 package se.lu.chemphys.sms.brightstat;
 
 import scala.swing._
-import ScalaTest._
+import Main._
 
 class StateManager extends SwingWorker {
 	var movieShower: MovieShower = null

@@ -3,7 +3,7 @@ package se.lu.chemphys.sms.brightstat;
 import scala.swing.SwingWorker
 
 class PerformanceMeter extends SwingWorker{
-	import ScalaTest.perfLabel
+	import Main.perfLabel
 	import java.lang.System.{currentTimeMillis => curTime}
 	
 	private var startTime = curTime

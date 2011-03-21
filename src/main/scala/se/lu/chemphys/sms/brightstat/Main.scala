@@ -8,7 +8,7 @@ import swing.event._
 import java.awt.image.BufferedImage
 import java.awt.Color
 
-object ScalaTest extends SimpleSwingApplication{
+object Main extends SimpleSwingApplication{
 
 	val state = new StateManager
 	

@@ -2,11 +2,7 @@ package se.lu.chemphys.sms.movies
 
 import java.awt.image.BufferedImage
 
-trait Imageable{
-	def getImage : BufferedImage
-}
-
-class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) extends Imageable {
+class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) {
 	import num._
 	val min: T = data.min
 	val max: T = data.max

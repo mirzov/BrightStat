@@ -3,7 +3,7 @@ package se.lu.chemphys.sms.brightstat;
 import scala.swing.SwingWorker
 
 class MovieShower extends SwingWorker{
-	import ScalaTest._
+	import Main._
 	private val rnd = new java.util.Random
 	private val meter = new PerformanceMeter
 	meter.start()
@@ -24,13 +24,13 @@ class MovieShower extends SwingWorker{
 		meter ! "reset"
 		var frNum = 1
 		while(!cancelled && frNum <= movie.Nframes){
-			var frame = movie.getImageable(frNum)
+			var frame = movie.getFrame(frNum)
 			image = frame.getImage
 			movieScreen.repaint
 			frNum = frNum + 1
 			//Thread.sleep(1)
 		}
-		ScalaTest.state ! "pause"
+		Main.state ! "pause"
 		meter ! movie.Nframes 
 //		while(!cancelled){
 //			var i = 0
