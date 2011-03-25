@@ -1,4 +1,5 @@
 package se.lu.chemphys.sms.movies
+import se.lu.chemphys.sms.spe.Pixel
 
 import java.awt.image.BufferedImage
 
@@ -31,6 +32,26 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			}
 			true
 		}
+	}
+	
+	def getBrightCluster(i: Int, j: Int, number: Int): Iterable[(Int, Int)] = {
+		def addNext(seed: Set[(Int, Int)]): Set[(Int, Int)] = {
+			var maxInt = min
+			var maxCoord: (Int, Int) = null
+			for(pix <- seed){
+				for(m <- (pix._1 - 1) to (pix._1 + 1); n <- (pix._2 - 1) to (pix._2 + 1)){
+					val int = this(m, n)
+					if(int > maxInt){
+						val coords = (m, n)
+						if(!seed.contains(coords)) {maxInt = int; maxCoord = coords}
+					}
+				}
+			}
+			seed + maxCoord
+		}
+		var res = Set((i, j))
+		for(n <- 1 to (number - 1)) res = addNext(res)
+		res
 	}
 	
 	def getImage : BufferedImage = {

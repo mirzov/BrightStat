@@ -22,6 +22,13 @@ class MovieTests extends JUnitSuite{
 	lazy val int16 = getMovie("99_10_SHORT_INT16.SPE")
 	lazy val long = getMovie("exc_profile.SPE")
 	
+	@Test def getBrightClusterTest(){
+		val frame = uint16.getFrame(1)
+		val cluster = frame.getBrightCluster(100, 100, 5)
+		println(cluster)
+		assertEquals(5, cluster.count(_ => true))
+	}
+	
 	@Test def parametersTest(){
 		assertEquals(3, byte.Nframes)
 		assertEquals(2, float.Nframes)
