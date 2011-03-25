@@ -2,5 +2,10 @@
 .scala_dependencies
 project/boot/*
 project/build/target/
+project/plugins/target
+project/plugins/lib_managed
+project/plugins/project
+project/plugins/src_managed
 lib_managed/*
 target/*
+out/*

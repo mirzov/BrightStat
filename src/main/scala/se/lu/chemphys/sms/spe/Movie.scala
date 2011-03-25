@@ -1,6 +1,5 @@
 package se.lu.chemphys.sms.spe
 
-import se.lu.chemphys.sms.movies.Frame
 import java.nio.ByteOrder
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel

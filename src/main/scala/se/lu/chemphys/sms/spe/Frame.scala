@@ -1,4 +1,4 @@
-package se.lu.chemphys.sms.movies
+package se.lu.chemphys.sms.spe
 
 import java.awt.image.BufferedImage
 

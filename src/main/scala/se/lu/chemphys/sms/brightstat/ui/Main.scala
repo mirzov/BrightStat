@@ -1,4 +1,4 @@
-package se.lu.chemphys.sms.brightstat;
+package se.lu.chemphys.sms.brightstat.ui;
 
 import se.lu.chemphys.sms.spe.Movie
 import java.awt.geom.AffineTransform
