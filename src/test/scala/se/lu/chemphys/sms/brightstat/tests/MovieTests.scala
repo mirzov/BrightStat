@@ -23,10 +23,12 @@ class MovieTests extends JUnitSuite{
 	lazy val long = getMovie("exc_profile.SPE")
 	
 	@Test def getBrightClusterTest(){
-		val frame = uint16.getFrame(1)
-		val cluster = frame.getBrightCluster(100, 100, 5)
+		val frame = int16.getFrame(3)
+		val cluster = frame.getBrightCluster(157, 104, 6).map(p => (p._1 + 1, p._2 + 1))
 		println(cluster)
-		assertEquals(5, cluster.count(_ => true))
+		assertEquals(6, cluster.size)
+		val expected = Set((158,105), (157,105), (159,104), (157,104), (159,105), (158,104))
+		assertEquals(expected, cluster)
 	}
 	
 	@Test def parametersTest(){
@@ -100,4 +102,11 @@ class MovieTests extends JUnitSuite{
 		assertEquals(106739, frame(511, 511))
 	}
 
+	@Test def isLocalMaxTest(){
+		var frame = float.getFrame(1)
+		assertTrue(frame.isLocalMax(156, 105))
+		frame = int16.getFrame(3)
+		assertTrue(frame.isLocalMax(169, 69))
+	}
+	
 }

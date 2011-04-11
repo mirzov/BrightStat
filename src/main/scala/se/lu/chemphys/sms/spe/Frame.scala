@@ -33,7 +33,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		}
 	}
 	
-	def getBrightCluster(i: Int, j: Int, number: Int): Iterable[(Int, Int)] = {
+	def getBrightCluster(i: Int, j: Int, number: Int): Set[(Int, Int)] = {
 		def addNext(seed: Set[(Int, Int)]): Set[(Int, Int)] = {
 			var maxInt = min
 			var maxCoord: (Int, Int) = null
