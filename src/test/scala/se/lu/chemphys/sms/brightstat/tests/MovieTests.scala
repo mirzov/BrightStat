@@ -1,5 +1,6 @@
 package se.lu.chemphys.sms.brightstat.tests
 
+import se.lu.chemphys.sms.brightstat._
 import org.scalatest.junit.JUnitSuite
 import java.io.File
 import se.lu.chemphys.sms.spe.Movie
@@ -21,6 +22,18 @@ class MovieTests extends JUnitSuite{
 	lazy val byte = getMovie("99_10_SHORT_BYTE.SPE")
 	lazy val int16 = getMovie("99_10_SHORT_INT16.SPE")
 	lazy val long = getMovie("exc_profile.SPE")
+	
+	@Test def detectLocalMaxsTest(){
+		val frame = int16.getFrame(3)
+		val pars = new PPars(){
+			UseROI = true
+			roi = ROI(155, 102, 159, 106)
+		}
+		def detected = frame.detectLocalMaxs(pars)
+		assertEquals(Seq((157, 104)), detected)
+		pars.roi = ROI(158, 98, 160, 99)
+		assertEquals(Seq((158, 99) ,(160, 98)), detected)
+	}
 	
 	@Test def getBrightClusterTest(){
 		val frame = int16.getFrame(3)
