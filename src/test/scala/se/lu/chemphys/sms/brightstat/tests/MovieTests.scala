@@ -23,6 +23,14 @@ class MovieTests extends JUnitSuite{
 	lazy val int16 = getMovie("99_10_SHORT_INT16.SPE")
 	lazy val long = getMovie("exc_profile.SPE")
 	
+//	@Test def detectMoleculesTest(){
+//		val frame = int16.getFrame(3)
+//		val pars = new PPars()
+//		val detected = frame.detectMolecules(pars)
+//		detected foreach println
+//		assertTrue(detected.length > 0)
+//	}
+	
 	@Test def detectLocalMaxsTest(){
 		val frame = int16.getFrame(3)
 		val pars = new PPars(){

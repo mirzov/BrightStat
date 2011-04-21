@@ -60,8 +60,41 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		for(i <- roi.left to roi.right; j <- roi.top to roi.bottom if isLocalMax(i, j)) yield (i, j)
 	}
 	
-	def filterMolsFromMaxs(localMaxs: Seq[(Int, Int)], pars: PPars): Seq[(Int, Int)] = {
-		localMaxs
+	def detectMolecules(pars: PPars): Seq[(Int, Int)] = {
+		detectLocalMaxs(pars)
+			.filter(m => isCompact(m._1, m._2, pars))
+			.filter(m => isSignificant(m._1, m._2, pars))
+	}
+	
+	private val fullROI = ROI(0, 0, XDim - 1, YDim - 1)
+	def isSignificant(x: Int, y: Int, pars: PPars): Boolean = {
+		val desiredROI = ROI(x - pars.ImRad, y - pars.ImRad, x + pars.ImRad, y + pars.ImRad)
+		val roi = fullROI.intersect(desiredROI)
+		var distaver = 0d; var Iaver = 0d; var dist2aver = 0d; var I2aver = 0d; var distIaver = 0d
+		var k = 0
+		for(i <- roi.left to roi.right; j <- roi.top to roi.bottom){
+			val dist2 = (i - x)*(i - x) + (j - y)*(j - y)
+			if(dist2 <= pars.ImRad * pars.ImRad)
+			{
+				val I = data(j * XDim + i).toDouble
+				val dist = math.sqrt(dist2)
+				distaver += dist
+				dist2aver += dist2
+				Iaver += I
+				I2aver += I*I
+				distIaver += dist*I
+				k += 1
+			}
+		}
+		val PearsonR=(distIaver-distaver*Iaver/k)/
+        	math.sqrt( (dist2aver-distaver*distaver/k)*(I2aver-Iaver*Iaver/k) );
+		PearsonR <= - pars.Correlation
+	}
+	
+	def isCompact(x: Int, y: Int, pars: PPars): Boolean = {
+		val cluster = getBrightCluster(x, y, pars.BrightNum)
+		val dist2max = pars.BrightSize * pars.BrightSize
+		cluster.forall(p => (x - p._1)*(x - p._1) + (y - p._2)*(y - p._2) < dist2max)
 	}
 	
 	def getImage : BufferedImage = {
