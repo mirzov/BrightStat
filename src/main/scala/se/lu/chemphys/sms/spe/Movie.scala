@@ -1,5 +1,7 @@
 package se.lu.chemphys.sms.spe
 
+import scala.collection.mutable.ArrayBuffer
+import se.lu.chemphys.sms.brightstat.PPars
 import java.nio.ByteOrder
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
@@ -9,6 +11,10 @@ import java.io.FileInputStream
 class Movie(filePath: String) {
 	private val file: FileChannel = new FileInputStream(filePath).getChannel
 	
+	override def finalize(){
+		file.close()
+	}
+
 	val headerLength = 4100
 	private val headerBytes = ByteBuffer.allocate(headerLength)
 	file.read(headerBytes)
@@ -71,7 +77,31 @@ class Movie(filePath: String) {
 		}
 	}
 	
-	override def finalize(){
-		file.close()
+	def detectMoleculesFromScratch(startFrame: Int, pars: PPars): Seq[(Int, Int, Double)] = {
+		def areSame(mol1: (Int, Int), mol2: (Int, Int)): Boolean = 
+			pars.withinImRange(mol1._1 - mol2._1, mol1._2 - mol2._2)
+		var frame = getFrame(startFrame)
+		var maxs = frame.detectLocalMaxs(pars)
+		var mols = frame.detectMolecules(maxs, pars).map{pix => (pix, 0)}
+		val endFrame = (startFrame + pars.NofStartFrames - 1).min(Nframes)
+		for(f <- (startFrame + 1) to endFrame){
+			frame = getFrame(f)
+			val newMols = ArrayBuffer[((Int, Int), Int)]()
+			for((pix, occurence) <- mols){
+				val newPix = frame.shiftToLocalMax(pix)
+				if(areSame(pix, newPix) && frame.isMolecule(pix, pars)) newMols += ((newPix, occurence + 1))
+				else if(occurence > 0) newMols += ((newPix, occurence))
+			}
+			maxs = frame.detectLocalMaxs(pars)
+			val freshmols = frame.detectMolecules(maxs, pars)
+			for(freshmol <- freshmols if newMols.exists(mol => areSame(mol._1, freshmol))){
+				newMols += ((freshmol, 0))
+			}
+			mols = newMols
+		}
+		val molPixels = mols.filter(_._2 > 0).map(_._1)
+		frame.markBrightNonMolecules(maxs, pars)
+		frame.calcSignals(molPixels, pars, false)
 	}
+	
 }

@@ -7,13 +7,21 @@ class PPars {
 	var SmRad = 6
 	var BrightNum = 8
 	var BrightSize = 2.24
-	var NofStartFrames = 1
+	var NofStartFrames = 3
 	var CutOff = 0.2
 	var NoiseSigms = 3
 	var Correlation = 0.6
 	var UseExProfile = false
 	var Normalize = false
 	var UseROI = false
-	var ExFrame: Frame[_] = _
+	var ExFrame: Frame[Double] = _
 	var roi: ROI = NoROI
+	
+	def withinImRange(dx: Int, dy: Int): Boolean = {
+		dx * dx + dy * dy <= ImRad * ImRad
+	}
+	
+	def withinSmRange(dx: Int, dy: Int): Boolean = {
+		dx * dx + dy * dy <= SmRad * SmRad
+	}
 }

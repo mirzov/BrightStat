@@ -1,0 +1,15 @@
+package se.lu.chemphys.sms.brightstat
+
+class PixelStatistics(values: Seq[Double], pars: PPars) {
+	var sum, stDevSum =  0d
+	var num = 0
+	values.foreach{v =>
+		sum += v
+		stDevSum += v * v
+		num += 1
+	}
+	val mean = if (num == 0) 0d else sum / num
+	val stdev = if (num == 0) 0d else Math.sqrt(stDevSum / num - mean * mean)
+	
+	def isWithin(value: Double): Boolean = value < (mean + pars.NoiseSigms * stdev)
+}
