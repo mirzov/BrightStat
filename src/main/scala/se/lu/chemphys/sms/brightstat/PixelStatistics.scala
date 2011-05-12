@@ -9,7 +9,7 @@ class PixelStatistics(values: Seq[Double], pars: PPars) {
 		num += 1
 	}
 	val mean = if (num == 0) 0d else sum / num
-	val stdev = if (num == 0) 0d else Math.sqrt(stDevSum / num - mean * mean)
+	val stdev = if (num == 0) 0d else scala.math.sqrt(stDevSum / num - mean * mean)
 	
 	def isWithin(value: Double): Boolean = value < (mean + pars.NoiseSigms * stdev)
 }

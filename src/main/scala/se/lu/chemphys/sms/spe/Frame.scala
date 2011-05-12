@@ -19,7 +19,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		data(j * XDim + i) = x
 	}
 	
-	val marks = new Marks(XDim, YDim)
+	lazy val marks = new Marks(XDim, YDim)
 	
 	def isLocalMax(i: Int, j: Int): Boolean = {
 		i > 0 && j > 0 && i < XDim - 1 && j < YDim - 1  && {
@@ -102,7 +102,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	def isMolecule(m: (Int, Int), pars: PPars) = isCompact(m._1, m._2, pars) && isSignificant(m._1, m._2, pars)
 	
 	def isSignificant(x: Int, y: Int, pars: PPars): Boolean = {
-		val desiredROI = ROI(x - pars.ImRad, y - pars.ImRad, x + pars.ImRad, y + pars.ImRad)
+		val imRad = scala.math.ceil(pars.ImRad).toInt
+		val desiredROI = ROI(x - imRad, y - imRad, x + imRad, y + imRad)
 		val roi = fullROI.intersect(desiredROI)
 		var distaver = 0d; var Iaver = 0d; var dist2aver = 0d; var I2aver = 0d; var distIaver = 0d
 		var k = 0
@@ -132,15 +133,18 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def calcLocalStat(x: Int, y: Int, pars: PPars): PixelStatistics = {
+		if(!withinRange(x, y)) throw new IndexOutOfBoundsException("Index is out of range in call to calcLocalStat")
+		val smRad = scala.math.ceil(pars.SmRad).toInt
 		val pixels = for(
-			i <- (x - pars.SmRad) to (x + pars.SmRad);
-			j <- (y - pars.SmRad) to (y + pars.SmRad)
+			i <- (x - smRad) to (x + smRad);
+			j <- (y - smRad) to (y + smRad)
 			if(marks.isEmpty(i, j))
 		) yield data(j * XDim + i).toDouble
 		new PixelStatistics(pixels, pars)
 	}
 	
 	def markBrightNonMolecules(maxs: Seq[(Int, Int)], pars: PPars){
+		val smRad = scala.math.ceil(pars.SmRad).toInt
 		var stats: PixelStatistics = null
 		def isTooBright(x: Int, y: Int) = !stats.isWithin(data(y * XDim + x).toDouble)
 		maxs.foreach{m =>
@@ -149,8 +153,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 				stats = calcLocalStat(x, y, pars)
 				if(isTooBright(x, y)){
 					for(
-						i <- (x - pars.SmRad) to (x + pars.SmRad);
-						j <- (y - pars.SmRad) to (y + pars.SmRad)
+						i <- (x - smRad) to (x + smRad);
+						j <- (y - smRad) to (y + smRad)
 						if marks.isEmpty(i, j) && isTooBright(i, j) && pars.withinSmRange(i - x, j - y)
 					) yield marks.makeBright(i, j)
 				}
@@ -158,8 +162,9 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		}
 	}
 	
-	def calcSignals(pixels: Seq[(Int, Int)], pars: PPars, filter: Boolean): Seq[(Int, Int, Double)] = {
-		for(
+	def calcSignals(pixels: Seq[(Int, Int)], pars: PPars, filter: Boolean): Array[MolStat] = {
+		val imRad = scala.math.ceil(pars.ImRad).toInt
+		(for(
 			(x, y) <- pixels;
 			val stats = calcLocalStat(x, y, pars)
 			if(!filter || !stats.isWithin(data(y * XDim + x).toDouble))
@@ -167,12 +172,29 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			var molSum = 0d
 			var num = 0
 			for(
-				i <- (x - pars.ImRad) to (x + pars.ImRad);
-				j <- (y - pars.ImRad) to (y + pars.ImRad);
+				i <- (x - imRad) to (x + imRad);
+				j <- (y - imRad) to (y + imRad);
 				if(pars.withinImRange(x - i, y - j))
 			) {molSum += data(y * XDim + x).toDouble; num +=1}
-			(x, y, molSum - stats.mean * num)
+			new MolStat{
+				this.x = x
+				this.y = y
+				I = molSum - stats.mean * num
+				background = stats.mean * num
+			}
+		}).toArray
+	}
+	
+	def followMolecules(mols: Array[MolStat], pars: PPars): Array[MolStat] = {
+		val maxs = detectLocalMaxs(pars)
+		detectMolecules(maxs, pars)
+		markBrightNonMolecules(maxs, pars)
+		val newCoords = mols.map { mol =>
+			val coord = (mol.x, mol.y)
+			val newCoord = shiftToLocalMax(coord)
+			if(pars.withinImRange(coord, newCoord) && isMolecule(newCoord, pars)) newCoord else coord 
 		}
+		calcSignals(newCoords, pars, false)
 	}
 	
 	def getImage : BufferedImage = {

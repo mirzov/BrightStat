@@ -1,5 +1,6 @@
 package se.lu.chemphys.sms.brightstat.ui;
 
+import se.lu.chemphys.sms.brightstat.PPars
 import se.lu.chemphys.sms.spe.Movie
 import java.awt.geom.AffineTransform
 import swing._
@@ -16,6 +17,8 @@ object Main extends SimpleSwingApplication{
 		preferredSize = (90, 25)
 	}
 	
+	var pars = new PPars()
+	
 	val startAction = Action("Start!") {state ! "start"}
 	val pauseAction = Action("Pause!"){state ! "pause"}
 
@@ -25,7 +28,16 @@ object Main extends SimpleSwingApplication{
 		
 	var image = new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR)
 	private val url = this.getClass.getResource("/test.SPE")
-	val movie = new Movie(url.getFile)
+	var movie = new Movie(url.getFile)
+	
+	private var frame = 1
+	def currentFrame = frame
+	def currentFrame_= (newFrame: Int){
+		if(movie != null && newFrame >= 1 && newFrame <= movie.Nframes){
+			image = movie.getFrame(newFrame).getImage
+			frame = newFrame
+		}
+	}
 	
 	val movieScreen = new BorderPanel{
 		border = Swing.BeveledBorder(Swing.Raised)
@@ -49,12 +61,13 @@ object Main extends SimpleSwingApplication{
 		){hGap = 30}
 	
 	val top = new MainFrame{
-		title = "The White Noise Show"
+		title = "BrightStat"
 		contents = new BorderPanel(){
 			import BorderPanel.Position._
 			add(controlPanel, South)
 			add(movieScreen, Center)
 		}
+		menuBar = new BrightStatMenuBar()
 		size = new Dimension(640, 480)
 		centerOnScreen()
 		state.start

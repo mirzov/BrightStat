@@ -20,9 +20,10 @@ class Marks(val XDim: Int, val YDim: Int) {
 	}
 	
 	def markMolecule(x: Int, y: Int, pars: PPars){
+		val imRad = scala.math.ceil(pars.ImRad).toInt
 		for(
-			i <- (x - pars.ImRad) to (x + pars.ImRad);
-			j <- y - pars.ImRad to (y + pars.ImRad)
+			i <- (x - imRad) to (x + imRad);
+			j <- (y - imRad) to (y + imRad)
             if pars.withinImRange(i - x, j - y)
         ) makeMolecule(i, j);
 	}

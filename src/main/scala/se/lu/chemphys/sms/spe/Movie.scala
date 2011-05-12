@@ -1,5 +1,6 @@
 package se.lu.chemphys.sms.spe
 
+import se.lu.chemphys.sms.brightstat.MolStat
 import scala.collection.mutable.ArrayBuffer
 import se.lu.chemphys.sms.brightstat.PPars
 import java.nio.ByteOrder
@@ -77,13 +78,13 @@ class Movie(filePath: String) {
 		}
 	}
 	
-	def detectMoleculesFromScratch(startFrame: Int, pars: PPars): Seq[(Int, Int, Double)] = {
+	def detectMoleculesFromScratch(startFrame: Int, pars: PPars): Array[MolStat] = {
 		def areSame(mol1: (Int, Int), mol2: (Int, Int)): Boolean = 
 			pars.withinImRange(mol1._1 - mol2._1, mol1._2 - mol2._2)
 		var frame = getFrame(startFrame)
 		var maxs = frame.detectLocalMaxs(pars)
 		var mols = frame.detectMolecules(maxs, pars).map{pix => (pix, 0)}
-		val endFrame = (startFrame + pars.NofStartFrames - 1).min(Nframes)
+		val endFrame = (startFrame + pars.NofStartFrames - 1).min(Nframes).toInt
 		for(f <- (startFrame + 1) to endFrame){
 			frame = getFrame(f)
 			val newMols = ArrayBuffer[((Int, Int), Int)]()
