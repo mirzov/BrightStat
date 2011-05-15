@@ -1,51 +1,37 @@
 package se.lu.chemphys.sms.brightstat.ui;
 
-import scala.swing._
 import Main._
+import se.lu.chemphys.sms.brightstat.BrightStat
+import se.lu.chemphys.sms.brightstat.BrightStatSaver
+import scala.swing.SwingWorker
 
 class StateManager extends SwingWorker {
-	//var movieShower: MovieShower = null
+
 	var calculator: BrightStatCalculator = null
 	
 	def act(){
 		
-		def initial : Nothing = {
-			//movieShower = new MovieShower
-			calculator = new BrightStatCalculator
+		def ready : Nothing = {
 			button.action = startAction
-			resetButton.enabled = false
-			perfLabel.text = "0 fps"
+			movieWidget.reset
 			react{
-				case "start" =>	calculator.start(); showing
+				case "start" =>	processing
 				case "quit" => quit()
-				case _ => initial
 			}
 		}
 		
-		def showing : Nothing = {
-			button.action = pauseAction
-			resetButton.enabled = false
+		def processing : Nothing = {
+		  	pars.startFrame = movieWidget.currentFrame
+			val calculator = new BrightStatCalculator(this, pars, i => movieWidget.currentFrame = i)
+		  	calculator.start()
+			button.action = cancelAction
 			react{
-				case "pause" => paused
-				case "quit" => quit()
-				case _ => showing
+				case "cancel" => calculator.cancelled = true; ready
+				case "quit" => calculator.cancelled = true; quit()
+				case result: BrightStat => new BrightStatSaver(result, movieFile).save(); ready
 			}
 		}
 		
-		def paused : Nothing = {
-//			movieShower.cancelled = true;
-//			movieShower = new MovieShower
-			button.action = startAction
-			resetButton.enabled = true
-			//perfLabel.text = "0 fps"
-			react{
-//				case "start" =>	movieShower.start(); showing
-//				case "reset" => movieShower.clearImage(); initial
-				case "quit" => quit()
-				case _ => paused
-			}
-		}
-		
-		initial
+		ready
 	}
 }

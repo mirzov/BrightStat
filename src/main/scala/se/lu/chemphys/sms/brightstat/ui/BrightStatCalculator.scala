@@ -1,29 +1,34 @@
 package se.lu.chemphys.sms.brightstat.ui
 
+import se.lu.chemphys.sms.spe.Utils
+import se.lu.chemphys.sms.brightstat.PPars
 import se.lu.chemphys.sms.brightstat.BrightStat
 import scala.swing.SwingWorker
-import Main._
-class BrightStatCalculator extends SwingWorker{
+import scala.actors.Actor
+
+class BrightStatCalculator(parent: Actor, pars: PPars, callBack: Int => Unit) extends SwingWorker{
+  
 	def act(){
 		val brightStat = new BrightStat
-		var molStats = movie.detectMoleculesFromScratch(currentFrame, pars)
-		var f = currentFrame + pars.NofStartFrames
+		var molStats = Main.movie.detectMoleculesFromScratch(pars, cancelled, callBack)
+		var f = pars.startFrame + pars.NofStartFrames - 1
 		brightStat.addMolStats(molStats, f)
 		
-		while (f > currentFrame){
+		while (f > pars.startFrame && !cancelled){
 			f -= 1
-			molStats = movie.getFrame(f).followMolecules(molStats, pars)
+			callBack(f)
+			molStats = Main.movie.getFrame(f).followMolecules(molStats, pars)
 			brightStat.addMolStats(molStats, f)
 		}
 		
-		f = currentFrame + pars.NofStartFrames
-		while (f < movie.Nframes ){
+		f = pars.startFrame + pars.NofStartFrames
+		while (f <= Main.movie.Nframes && !cancelled){
+			callBack(f)
+			molStats = Main.movie.getFrame(f).followMolecules(molStats, pars)
+			brightStat.addMolStats(molStats, f)
 			f += 1
-			molStats = movie.getFrame(f).followMolecules(molStats, pars)
-			brightStat.addMolStats(molStats, f)
 		}
 		
-		brightStat.printIntensityReport(System.out)
-		
+		parent ! brightStat
 	}
 }

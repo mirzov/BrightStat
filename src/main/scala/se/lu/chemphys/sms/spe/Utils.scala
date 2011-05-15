@@ -1,5 +1,8 @@
 package se.lu.chemphys.sms.spe
 
+import scala.collection.mutable.ArrayBuffer
+import se.lu.chemphys.sms.brightstat.MolStat
+import se.lu.chemphys.sms.brightstat.PPars
 object Utils {
 	
 	def shortBytesToInts(shorts: Array[Byte]): Array[Int] = {
@@ -57,4 +60,17 @@ object Utils {
 		}
 		array
 	}
+
+	def getClusterSizeSq(cluster: Iterable[(Int, Int)], center: (Int, Int)): Float = {
+		var sizeSq = 0f
+		val (x, y) = center
+		for((i, j) <- cluster){
+			val dx = i - x
+			val dy = j - y
+			val curSizeSq = dx * dx + dy * dy;
+			if(sizeSq < curSizeSq) sizeSq = curSizeSq
+		}
+		sizeSq
+	}
+	
 }

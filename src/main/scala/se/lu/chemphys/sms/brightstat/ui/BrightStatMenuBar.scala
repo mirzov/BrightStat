@@ -1,9 +1,11 @@
 package se.lu.chemphys.sms.brightstat.ui
 
+import se.lu.chemphys.sms.spe.MovieFromSpeFile
 import java.io.File
 import se.lu.chemphys.sms.spe.Movie
 import scala.swing._
 import scala.collection.mutable.Seq
+import se.lu.chemphys.sms.spe.MovieFromFrames
 
 class BrightStatMenuBar extends MenuBar{
 	
@@ -19,7 +21,8 @@ class BrightStatMenuBar extends MenuBar{
 		val res = chooser.showOpenDialog(this)
 		if(res == FileChooser.Result.Approve){
 			openDir = chooser.selectedFile.getParentFile
-			Main.movie = new Movie(chooser.selectedFile.getAbsolutePath)
+			Main.movie = new MovieFromSpeFile(chooser.selectedFile.getAbsolutePath)
+			Main.movieFile = chooser.selectedFile
 		}
 	}
 	
@@ -33,13 +36,21 @@ class BrightStatMenuBar extends MenuBar{
 	private val prefAction = Action("Preferences") {
 		val dialog = new PParsDialog(Main.top)
 		dialog.centerOnScreen
-		dialog.open//visible = true
-//		parsDialog.open
-//		if(!parsDialog.showing) println ("Not showing the dialog for some reason!")
+		dialog.open
 	}
 	
 	contents += new Menu("Edit"){
 		contents += new MenuItem(prefAction)
+	}
+	
+	private val sumUpAction = Action("Sum the frames up"){
+		val sumFrame = Main.movie.sumUpFrames
+		val sumMovie = new MovieFromFrames(IndexedSeq(sumFrame))
+		Main.movie = sumMovie
+	}
+	
+	contents += new Menu("Calculate"){
+		contents += new MenuItem(sumUpAction)
 	}
 	
 }

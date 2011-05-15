@@ -49,17 +49,22 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def shiftToBrightestNeighbor(pixel: (Int, Int)): (Int, Int) = {
-		var (x, y) = pixel
-		val desiredRoi = ROI(x - 1, y - 1, x + 1, y + 1)
-		val roi = fullROI.intersect(desiredRoi)
-		var iMax = Double.MinValue
-		for(i <- roi.left to roi.right; j <- roi.top to roi.bottom){
-			if(data(j * XDim + i).toDouble > iMax){
-				iMax = data(j * XDim + i).toDouble
-				x = i; y = j
+		val (x, y) = pixel
+		var iMax = data(y * XDim + x).toDouble
+		var xmax = x; var ymax = y;
+		var i = x - 1
+		while(i <= x + 1){
+			var j = y - 1
+			while(j <= y + 1){
+				val candidate = data(j * XDim + i).toDouble
+				if(candidate > iMax){
+					xmax = i; ymax = j; iMax = candidate
+				}
+				j += 1
 			}
+			i += 1
 		}
-		(x, y)
+		(xmax, ymax)
 	}
 	
 	def getBrightCluster(i: Int, j: Int, number: Int): Set[(Int, Int)] = {
@@ -83,7 +88,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def detectLocalMaxs(pars: PPars): Seq[(Int, Int)] = {
-		val maxROI = ROI(1, 1, XDim - 2, YDim - 2)
+		val margin = (pars.SmRad * 2).ceil.toInt 
+		val maxROI = ROI(margin, margin, XDim - 1 - margin, YDim - 1 - margin)
 		val roi = if(pars.UseROI) pars.roi.intersect(maxROI) else maxROI
 		for(
 			i <- roi.left to roi.right;
@@ -128,23 +134,21 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	
 	def isCompact(x: Int, y: Int, pars: PPars): Boolean = {
 		val cluster = getBrightCluster(x, y, pars.BrightNum)
-		val dist2max = pars.BrightSize * pars.BrightSize
-		cluster.forall(p => (x - p._1)*(x - p._1) + (y - p._2)*(y - p._2) < dist2max)
+		val clusterSizeSq = Utils.getClusterSizeSq(cluster, (x, y))
+		clusterSizeSq <= pars.BrightSize * pars.BrightSize
 	}
 	
 	def calcLocalStat(x: Int, y: Int, pars: PPars): PixelStatistics = {
 		if(!withinRange(x, y)) throw new IndexOutOfBoundsException("Index is out of range in call to calcLocalStat")
-		val smRad = scala.math.ceil(pars.SmRad).toInt
 		val pixels = for(
-			i <- (x - smRad) to (x + smRad);
-			j <- (y - smRad) to (y + smRad)
+			i <- (x - pars.SmRad).toInt to (x + pars.SmRad).toInt;
+			j <- (y - pars.SmRad).toInt to (y + pars.SmRad).toInt
 			if(marks.isEmpty(i, j))
 		) yield data(j * XDim + i).toDouble
 		new PixelStatistics(pixels, pars)
 	}
 	
 	def markBrightNonMolecules(maxs: Seq[(Int, Int)], pars: PPars){
-		val smRad = scala.math.ceil(pars.SmRad).toInt
 		var stats: PixelStatistics = null
 		def isTooBright(x: Int, y: Int) = !stats.isWithin(data(y * XDim + x).toDouble)
 		maxs.foreach{m =>
@@ -153,8 +157,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 				stats = calcLocalStat(x, y, pars)
 				if(isTooBright(x, y)){
 					for(
-						i <- (x - smRad) to (x + smRad);
-						j <- (y - smRad) to (y + smRad)
+						i <- (x - pars.SmRad).toInt to (x + pars.SmRad).toInt;
+						j <- (y - pars.SmRad).toInt to (y + pars.SmRad).toInt
 						if marks.isEmpty(i, j) && isTooBright(i, j) && pars.withinSmRange(i - x, j - y)
 					) yield marks.makeBright(i, j)
 				}
@@ -163,25 +167,27 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def calcSignals(pixels: Seq[(Int, Int)], pars: PPars, filter: Boolean): Array[MolStat] = {
-		val imRad = scala.math.ceil(pars.ImRad).toInt
 		(for(
 			(x, y) <- pixels;
-			val stats = calcLocalStat(x, y, pars)
+			val stats = {
+						//print("calculating for (" + x + ", " + y + ")...");
+						val stt = calcLocalStat(x, y, pars);
+						//println(stt);
+						stt}
 			if(!filter || !stats.isWithin(data(y * XDim + x).toDouble))
 		) yield {
 			var molSum = 0d
 			var num = 0
 			for(
-				i <- (x - imRad) to (x + imRad);
-				j <- (y - imRad) to (y + imRad);
+				i <- (x - pars.ImRad).toInt to (x + pars.ImRad).toInt;
+				j <- (y - pars.ImRad).toInt to (y + pars.ImRad).toInt;
 				if(pars.withinImRange(x - i, y - j))
 			) {molSum += data(y * XDim + x).toDouble; num +=1}
-			new MolStat{
-				this.x = x
-				this.y = y
-				I = molSum - stats.mean * num
-				background = stats.mean * num
-			}
+			val molStat = new MolStat
+			molStat.x = x; molStat.y = y
+			molStat.I = molSum - stats.mean * num
+			molStat.background = stats.mean * num
+			molStat
 		}).toArray
 	}
 	
@@ -195,6 +201,14 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			if(pars.withinImRange(coord, newCoord) && isMolecule(newCoord, pars)) newCoord else coord 
 		}
 		calcSignals(newCoords, pars, false)
+	}
+	
+	def addDataToArray(sumAccumulator: Array[Double]){
+		assert(sumAccumulator.size == XDim * YDim, 
+		    "Tried to accumulate Frame sum into an incompatible-size array.")
+		for(i <- 0 to sumAccumulator.size - 1){
+			sumAccumulator(i) += data(i).toDouble
+		}
 	}
 	
 	def getImage : BufferedImage = {

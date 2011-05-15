@@ -3,12 +3,12 @@ package se.lu.chemphys.sms.brightstat
 import se.lu.chemphys.sms.spe.Frame
 
 class PPars {
-	var ImRad = 3f
-	var SmRad = 6f
+	var ImRad = 2.24f
+	var SmRad = 7f
 	var BrightNum = 8
 	var BrightSize = 2.24f
-	var NofStartFrames = 3
-	var CutOff = 0.2f
+	var NofStartFrames = 10
+	var CutOff = 0.3f
 	var NoiseSigms = 3f
 	var Correlation = 0.6f
 	var UseExProfile = false
@@ -16,6 +16,7 @@ class PPars {
 	var UseROI = false
 	var ExFrame: Frame[Double] = _
 	var roi: ROI = NoROI
+	var startFrame = 1
 	
 	def withinImRange(dx: Int, dy: Int): Boolean = {
 		dx * dx + dy * dy <= ImRad * ImRad

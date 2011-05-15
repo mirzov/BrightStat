@@ -1,5 +1,6 @@
 package se.lu.chemphys.sms.brightstat.tests
 
+import se.lu.chemphys.sms.spe.MovieFromSpeFile
 import java.io.File
 import se.lu.chemphys.sms.spe.Movie
 import org.scalatest.junit.JUnitSuite
@@ -9,7 +10,7 @@ trait BrightStatSuite extends JUnitSuite{
 	private def getMovie(filename: String): Movie = {
 		val url = this.getClass.getResource("/" + filename)
 		val file = new File(url.getFile)
-		new Movie(file.getAbsolutePath)
+		new MovieFromSpeFile(file.getAbsolutePath)
 	}
 	
 	lazy val uint16 = getMovie("test.SPE")

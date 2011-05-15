@@ -55,8 +55,6 @@ class PParsDialog(owner: Window) extends Dialog(owner) {
 			}
 		}
 		checks.foreach{case (key, _, checkBox) => Main.pars.setBooleanValue(key, checkBox.selected)}
-		Main.pars.UseROI = true
-		Main.pars.roi = ROI(100, 100, 150, 150)
 		close()
 	}
 	
