@@ -29,6 +29,6 @@ class BrightStatCalculator(parent: Actor, pars: PPars, callBack: Int => Unit) ex
 			f += 1
 		}
 		
-		parent ! brightStat
+		if (!cancelled) parent ! brightStat
 	}
 }

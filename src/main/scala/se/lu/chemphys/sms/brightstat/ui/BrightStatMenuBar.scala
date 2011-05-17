@@ -7,7 +7,7 @@ import scala.swing._
 import scala.collection.mutable.Seq
 import se.lu.chemphys.sms.spe.MovieFromFrames
 
-class BrightStatMenuBar extends MenuBar{
+class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	
 	private val quitAction = Action("Quit") {Main.state ! "quit"}
 	
@@ -26,9 +26,10 @@ class BrightStatMenuBar extends MenuBar{
 		}
 	}
 	
+	val openItem = new MenuItem(openAction)
+	val quitItem = new MenuItem(quitAction)
 	contents += new Menu("File"){
-		contents += new MenuItem(openAction)
-		contents += new MenuItem(quitAction)
+		contents += (openItem, quitItem)
 	}
 	
 //	private val parsDialog = new PParsDialog(Main.top)
@@ -38,9 +39,9 @@ class BrightStatMenuBar extends MenuBar{
 		dialog.centerOnScreen
 		dialog.open
 	}
-	
+	val prefItem = new MenuItem(prefAction)
 	contents += new Menu("Edit"){
-		contents += new MenuItem(prefAction)
+		contents += prefItem
 	}
 	
 	private val sumUpAction = Action("Sum the frames up"){
@@ -48,9 +49,21 @@ class BrightStatMenuBar extends MenuBar{
 		val sumMovie = new MovieFromFrames(IndexedSeq(sumFrame))
 		Main.movie = sumMovie
 	}
-	
+	val sumItem = new MenuItem(sumUpAction)
 	contents += new Menu("Calculate"){
-		contents += new MenuItem(sumUpAction)
+		contents += sumItem
 	}
+	
+	def toReady(){
+		openItem.enabled = true
+		prefItem.enabled = true
+		sumItem.enabled = true
+	}
+	def toProcessing(){
+		openItem.enabled = false
+		prefItem.enabled = false
+		sumItem.enabled = false
+	}
+
 	
 }

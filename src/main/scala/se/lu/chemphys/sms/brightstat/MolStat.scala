@@ -23,12 +23,20 @@ class BrightStat {
 	
 	def getNMols = nMols
 	
-	def printIntensityReport(out: PrintStream){
+	private def printAnyIntensityReport(out: PrintStream, toIntens: MolStat => Double){
 		out.println("Frame\tMol" + (1 to getNMols).mkString("\tMol"))
 		for((k, v) <- molStatsSilo){
 			out.print(k.toString + "\t")
-			out println v.map(_.I.formatted("%.2f")).mkString("\t")
+			out println v.map(molstat => toIntens(molstat).formatted("%.2f")).mkString("\t")
 		}
+	}
+	
+	def printIntensityReport(out: PrintStream){
+		printAnyIntensityReport(out, _.I)
+	}
+	
+	def printBackgroundReport(out: PrintStream){
+		printAnyIntensityReport(out, _.background)
 	}
 	
 	def printCoordinatesReport(frame: Int, out: PrintStream){

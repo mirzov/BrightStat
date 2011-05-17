@@ -11,16 +11,15 @@ class BrightStatSaver(brightStat: BrightStat, moviePath: File) {
 		val resFolder = new File(folder, filename)
 		resFolder.mkdir
 		
-		val coorFile = new File(resFolder, filename + "_coor.txt")
-		//println("Coordinates report file = " + coorFile.getAbsolutePath)
-		val coorStream = new java.io.FileOutputStream(coorFile)
-		brightStat.printCoordinatesReport(new PrintStream(coorStream))
-		coorStream.close
+		def printReport(suffix: String, reportSelector: BrightStat => PrintStream => Unit){
+			val file = new File(resFolder, filename + "_" + suffix + ".txt")
+			val stream = new java.io.FileOutputStream(file)
+			reportSelector(brightStat)(new PrintStream(stream))
+			stream.close
+		}
 		
-		val kinFile = new File(resFolder, filename + "_kin.txt")
-		val kinStream = new java.io.FileOutputStream(kinFile)
-		brightStat.printIntensityReport(new PrintStream(kinStream))
-		kinStream.close
+		printReport("coor", _.printCoordinatesReport)
+		printReport("kin", _.printIntensityReport)
+		printReport("bkgr", _.printBackgroundReport)
 	}
-
 }

@@ -1,25 +1,66 @@
 package se.lu.chemphys.sms.brightstat.ui
+
 import scala.swing._
 import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 import scala.swing.event.ValueChanged
+import se.lu.chemphys.sms.brightstat.ROI
 
-class MovieWidget {
+class MovieWidget extends StatefulUiComponent {
 
 	private var image = new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR)
+	private val roirect = new java.awt.Rectangle()
+	private var showRoi = false
+	
+	def point2ints(point: Point) = (point.getX.toInt, point.getY.toInt)
 
-	private val movieScreen = new BorderPanel{
-		border = Swing.BeveledBorder(Swing.Raised)
+	def getRoi: ROI = {
+		val (left, top) = point2ints(roirect.getLocation)
+		val right = roirect.getWidth.toInt + left
+		val bottom = roirect.getHeight.toInt + top
+		ROI(left, top, right, bottom)
+	}
+	
+	val movieScreen = new BorderPanel{
 		def transform : AffineTransform = {
-			val insets = border.getBorderInsets(this.peer)
-			val width = size.width - insets.right - insets.left
-			val height = size.height - insets.bottom - insets.top
+			val width = size.width
+			val height = size.height
 			val scaleX = width.toDouble / image.getWidth
 			val scaleY = height.toDouble / image.getHeight
-			new AffineTransform(scaleX, 0, 0, scaleY, insets.left, insets.top)
+			new AffineTransform(scaleX, 0, 0, scaleY, 0, 0)
+		}
+		def lookup(pixel: Point) = {
+			val res = transform.inverseTransform(pixel, new Point())
+			(res.getX.toInt + 1, res.getY.toInt + 1)
 		}
 		override def paint(g: Graphics2D){
 			g.drawImage(image, transform, null)
+			if(showRoi) {
+				g.setColor(java.awt.Color.YELLOW)
+				g.draw(roirect)
+			}
+		}
+		
+		listenTo(mouse.clicks)
+		reactions += {
+			case down: event.MousePressed  =>
+			  	val (x, y) = point2ints(down.point)
+				roirect.setBounds(x, y, 0, 0)
+				Main.state ! "selectroi"
+				//println (down)
+			case drag: event.MouseDragged =>
+			  	val (x, y) = point2ints(drag.point)
+			  	roirect.add(x, y)
+			  	repaint
+			  	//println(drag)
+			case up: event.MouseReleased =>
+			  	if(point2ints(up.point) == point2ints(roirect.getLocation)){
+			  		Main.state ! "noroi"
+			  		showRoi = false
+			  		repaint
+			  	} else {Main.state ! roirect}
+			  	Main.state ! "finishselectingroi"
+			  	//println(up)
 		}
 	}
   
@@ -56,9 +97,20 @@ class MovieWidget {
 		}
 	}
 
-	def reset(){
+	def toReady(){
 		currentFrame = 1
 		movieSlider.max = Main.movie.Nframes
 		movieSlider.value = 1
+		movieSlider.enabled = true
+		movieScreen.deafTo(movieScreen.mouse.moves)
+	}
+	
+	def toProcessing(){
+		movieSlider.enabled = false
+	}
+	
+	override def toRoiSelection(){
+		showRoi = true
+		movieScreen.listenTo(movieScreen.mouse.moves)
 	}
 }

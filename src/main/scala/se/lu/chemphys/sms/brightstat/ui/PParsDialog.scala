@@ -21,8 +21,8 @@ class PParsDialog(owner: Window) extends Dialog(owner) {
 	)
 	private val checkBoxLabels = Set(
 		("UseExProfile", 	"Use excitation profile"),
-		("Normalize",		"Normalize by excitation"),
-		("UseROI",			"Use ROI")
+		("Normalize",		"Normalize by excitation")
+//		("UseROI",			"Use ROI")
 	)
 	
 	import Main.pars
