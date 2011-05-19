@@ -88,9 +88,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def detectLocalMaxs(pars: PPars): Seq[(Int, Int)] = {
-		val margin = (pars.SmRad * 2).ceil.toInt 
-		val maxROI = ROI(margin, margin, XDim - 1 - margin, YDim - 1 - margin)
-		val roi = if(pars.UseROI) pars.roi.intersect(maxROI) else maxROI
+		val roi = pars.getSafeRoi(XDim, YDim)
 		for(
 			i <- roi.left to roi.right;
 			j <- roi.top to roi.bottom

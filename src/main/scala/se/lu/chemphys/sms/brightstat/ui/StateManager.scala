@@ -63,8 +63,8 @@ class StateManager extends SwingWorker {
 					case "noroi" => pars.UseROI = false
 					case roi: java.awt.Rectangle =>
 					  	pars.roi = movieWidget.getRoi
-						//control widget's roi info update here
-					case _ => println("Stuck in roiselection")
+						Main.controlWidget.setRoi
+					case _ =>
 				}
 			}
 		}

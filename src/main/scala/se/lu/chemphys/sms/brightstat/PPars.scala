@@ -28,6 +28,12 @@ class PPars {
 		dx * dx + dy * dy <= SmRad * SmRad
 	}
 	
+	def getSafeRoi(XDim: Int, YDim: Int) = {
+		val margin = (SmRad * 2).ceil.toInt 
+		val maxROI = ROI(margin, margin, XDim - 1 - margin, YDim - 1 - margin)
+		if(UseROI) maxROI.intersect(roi) else maxROI
+	}
+	
 	def getNumericValue(varName: String): String = varName match{
 		case "ImRad" => ImRad.toString
 		case "SmRad" => SmRad.toString
