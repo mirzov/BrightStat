@@ -11,7 +11,7 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	val state = new StateManager
 	val pars = new PPars()
 	
-	val movieWidget = new MovieWidget
+	val movieWidget = new MovieWidget(movie, state)
 	val controlWidget = new ControlWidget(movieWidget)
 	val brightStatMenuBar = new BrightStatMenuBar()
 	
@@ -34,6 +34,7 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	def movie = _movie 
 	def movie_= (newMovie: Movie){
 		_movie = newMovie
+		movieWidget.initMovie()
 		state ! "ready"
 	}
 	

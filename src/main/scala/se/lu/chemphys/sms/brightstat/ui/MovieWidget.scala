@@ -5,8 +5,9 @@ import java.awt.image.BufferedImage
 import java.awt.geom.AffineTransform
 import scala.swing.event.ValueChanged
 import se.lu.chemphys.sms.brightstat.ROI
+import se.lu.chemphys.sms.spe.Movie
 
-class MovieWidget extends StatefulUiComponent {
+class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiComponent {
 
 	private var image = new BufferedImage(100, 100, BufferedImage.TYPE_3BYTE_BGR)
 	private val roirect = new java.awt.Rectangle()
@@ -46,7 +47,7 @@ class MovieWidget extends StatefulUiComponent {
 			case down: event.MousePressed  =>
 			  	val (x, y) = point2ints(down.point)
 				roirect.setBounds(x, y, 0, 0)
-				Main.state ! "selectroi"
+				state ! "selectroi"
 				//println (down)
 			case drag: event.MouseDragged =>
 			  	val (x, y) = point2ints(drag.point)
@@ -55,16 +56,16 @@ class MovieWidget extends StatefulUiComponent {
 			  	//println(drag)
 			case up: event.MouseReleased =>
 			  	if(point2ints(up.point) == point2ints(roirect.getLocation)){
-			  		Main.state ! "noroi"
+			  		state ! "noroi"
 			  		showRoi = false
 			  		repaint
-			  	} else {Main.state ! roirect}
-			  	Main.state ! "finishselectingroi"
+			  	} else {state ! roirect}
+			  	state ! "finishselectingroi"
 			  	//println(up)
 		}
 	}
   
-	private val movieSlider = new Slider{
+	val movieSlider = new Slider{
 		orientation = Orientation.Horizontal
 		min = 1
 		paintLabels = true
@@ -76,15 +77,9 @@ class MovieWidget extends StatefulUiComponent {
 	private var frame = 1
 	def currentFrame = frame
 	def currentFrame_= (newFrame: Int){
-		if(Main.movie != null && newFrame >= 1 && newFrame <= Main.movie.Nframes){
+		if(movie != null && newFrame >= 1 && newFrame <= movie.Nframes){
 			movieSlider.value = newFrame
 		}
-	}
-	
-	private def refreshFrame(){
-		frame = movieSlider.value
-		image = Main.movie.getFrame(frame).getImage
-		movieScreen.repaint
 	}
 	
 	val moviePanel = new BoxPanel(Orientation.Vertical){
@@ -93,14 +88,19 @@ class MovieWidget extends StatefulUiComponent {
 		listenTo(movieSlider)
 		reactions += {
 		case valChange: ValueChanged if valChange.source == movieSlider => 
-			refreshFrame()
+			frame = movieSlider.value
+			image = movie.getFrame(frame).getImage
+			movieScreen.repaint
 		}
+	}
+	
+	def initMovie(){
+		currentFrame = 1
+		movieSlider.max = movie.Nframes
+		movieSlider.value = 1
 	}
 
 	def toReady(){
-		currentFrame = 1
-		movieSlider.max = Main.movie.Nframes
-		movieSlider.value = 1
 		movieSlider.enabled = true
 		movieScreen.deafTo(movieScreen.mouse.moves)
 	}

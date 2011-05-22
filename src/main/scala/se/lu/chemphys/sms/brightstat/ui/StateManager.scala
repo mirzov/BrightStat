@@ -36,6 +36,8 @@ class StateManager extends SwingWorker {
 					case "quit" => quit()
 					case "ready" => ready()
 					case "selectroi" => roiselection()
+					case "setexroi" => pars.exRoi = pars.roi
+					case "setemroi" => pars.emRoi = pars.roi
 					case _ => 
 				}
 			}
@@ -49,7 +51,10 @@ class StateManager extends SwingWorker {
 				react{
 					case "cancel" => calculator.cancelled = true; ready()
 					case "quit" => calculator.cancelled = true; quit()
-					case result: BrightStat => new BrightStatSaver(result, movieFile).save(); ready()
+					case result: BrightStat => 
+					  	new BrightStatSaver(result, movieFile).save()
+					  	movieWidget.currentFrame = pars.startFrame
+					  	ready()
 					case _ => 
 				}
 			}

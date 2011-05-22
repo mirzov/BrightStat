@@ -16,6 +16,8 @@ class PPars {
 	var UseROI = false
 	var ExFrame: Frame[Double] = _
 	var roi: ROI = NoROI
+	var exRoi: ROI = NoROI
+	var emRoi: ROI = NoROI
 	var startFrame = 1
 	
 	def withinImRange(dx: Int, dy: Int): Boolean = {
