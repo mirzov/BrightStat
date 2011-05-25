@@ -209,7 +209,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		}
 	}
 	
-	def calsSumInRoi(roi: ROI): Double = {
+	def calcSumInRoi(roi: ROI): Double = {
 		var sum = 0d
 		for(i <- roi.left to roi.right; j <- roi.top to roi.bottom){
 			sum += data(j * XDim + i).toDouble

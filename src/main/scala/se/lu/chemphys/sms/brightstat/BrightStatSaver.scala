@@ -11,15 +11,19 @@ class BrightStatSaver(brightStat: BrightStat, moviePath: File) {
 		val resFolder = new File(folder, filename)
 		resFolder.mkdir
 		
-		def printReport(suffix: String, reportSelector: BrightStat => PrintStream => Unit){
-			val file = new File(resFolder, filename + "_" + suffix + ".txt")
+		def printReport(file: File, reportSelector: BrightStat => PrintStream => Unit){
 			val stream = new java.io.FileOutputStream(file)
 			reportSelector(brightStat)(new PrintStream(stream))
 			stream.close
 		}
 		
-		printReport("coor", _.printCoordinatesReport)
-		printReport("kin", _.printIntensityReport)
-		printReport("bkgr", _.printBackgroundReport)
+		def suffixedFile(suffix: String) = new File(resFolder, filename + "_" + suffix + ".txt")
+
+		printReport(suffixedFile("coor"), _.printCoordinatesReport)
+		printReport(suffixedFile("kin"), _.printIntensityReport)
+		printReport(suffixedFile("bkgr"), _.printBackgroundReport)
+		
+		printReport(new File(resFolder, "SignalsEx.txt"), _.printExSignalsReport)
+		printReport(new File(resFolder, "SignalsEm.txt"), _.printEmSignalsReport)
 	}
 }

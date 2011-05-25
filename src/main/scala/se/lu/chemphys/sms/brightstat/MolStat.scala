@@ -28,7 +28,7 @@ class BrightStat {
 	}
 	
 	def addEmSignal(signal: Double, frame: Int){
-		exSignalsSilo += ((frame, signal))
+		emSignalsSilo += ((frame, signal))
 	}
 	
 	def getNMols = nMols
@@ -60,5 +60,13 @@ class BrightStat {
 	def printCoordinatesReport(out: PrintStream){
 		val minFrame = molStatsSilo.head._1
 		printCoordinatesReport(minFrame, out)
+	}
+	
+	def printExSignalsReport(out: PrintStream){
+		for((_, signal) <- exSignalsSilo) out.println(signal)
+	}
+	
+	def printEmSignalsReport(out: PrintStream){
+		for((_, signal) <- emSignalsSilo) out.println(signal)
 	}
 }
