@@ -14,13 +14,15 @@ class BrightStatCalculator(parent: Actor, pars: PPars, callBack: Int => Unit) ex
 		var f = pars.startFrame + pars.NofStartFrames - 1
 		brightStat.addMolStats(molStats, f)
 		
+		val startFrameMolStats = molStats
 		while (f > pars.startFrame && !cancelled){
 			f -= 1
 			callBack(f)
-			molStats = Main.movie.getFrame(f).followMolecules(molStats, pars)
+			val frame = Main.movie.getFrame(f) 
+			molStats = frame.followMolecules(molStats, pars)
 			brightStat.addMolStats(molStats, f)
 		}
-		
+		molStats = startFrameMolStats
 		f = pars.startFrame + pars.NofStartFrames
 		while (f <= Main.movie.Nframes && !cancelled){
 			callBack(f)

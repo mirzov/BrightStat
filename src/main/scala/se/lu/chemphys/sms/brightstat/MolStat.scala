@@ -12,6 +12,8 @@ class MolStat {
 class BrightStat {
 
 	private var molStatsSilo = TreeMap[Int, Array[MolStat]]()
+	private var exSignalsSilo = TreeMap[Int, Double]()
+	private var emSignalsSilo = TreeMap[Int, Double]()
 	private var nMols = 0
 	
 	def addMolStats(molStats: Array[MolStat], frame: Int){
@@ -19,6 +21,14 @@ class BrightStat {
 		if(nMols != molStats.size) throw new IllegalArgumentException("The number of molecules must" +
 			" be constant (changed from " + nMols + " to " + molStats.size + " on frame " + frame + ")")
 		molStatsSilo += ((frame, molStats))
+	}
+	
+	def addExSignal(signal: Double, frame: Int){
+		exSignalsSilo += ((frame, signal))
+	}
+	
+	def addEmSignal(signal: Double, frame: Int){
+		exSignalsSilo += ((frame, signal))
 	}
 	
 	def getNMols = nMols
