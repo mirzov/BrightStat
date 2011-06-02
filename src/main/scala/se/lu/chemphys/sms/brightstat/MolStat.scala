@@ -17,6 +17,16 @@ class BrightStat {
 	private var emSignalsSilo = TreeMap[Int, Double]()
 	private var nMols = 0
 	
+	def nMolecules = nMols
+	def getKinTrace(mol: Int): Seq[(Int, MolStat)] = {
+		assert(mol >= 0 && mol < nMolecules, "The molecule number is out of range: " + mol)
+		for((frame, molStats) <- molStatsSilo.toSeq) yield (frame, molStats(mol))
+	}
+	def getCoords(mol: Int, frame: Int): (Int, Int) = {
+		val molStat = molStatsSilo(frame)(mol)
+		(molStat.x, molStat.y)
+	}
+	
 	def addMolStats(molStats: Array[MolStat], frame: Int){
 		if(nMols == 0) nMols = molStats.size
 		if(nMols != molStats.size) throw new IllegalArgumentException("The number of molecules must" +

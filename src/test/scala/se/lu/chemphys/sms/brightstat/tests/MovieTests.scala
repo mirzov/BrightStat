@@ -6,6 +6,8 @@ import se.lu.chemphys.sms.spe.Movie
 import org.junit.Test
 import org.junit.Assert._
 import scala.io.Source
+import se.lu.chemphys.sms.brightstat.ui.BrightStatCalculator
+import scala.actors.Actor
 
 class MovieTests extends BrightStatSuite{
 
@@ -55,6 +57,28 @@ class MovieTests extends BrightStatSuite{
 		val detected = uint16.detectMoleculesFromScratch(pars)
 		val gotCoords = detected.map(stat => (stat.x + 1, stat.y + 1)).toArray
 		gotCoords foreach println
+	}
+	
+	@Test def brightStatCalulationTest(){
+		val pars = getPars(10)
+		pars.roi = ROI(44, 155, 68, 172)
+		pars.UseROI = true
+		val calc = new BrightStatCalculator(uint16, Actor.self, pars, i => ())
+		calc.start()
+		
+		val url = this.getClass.getResource("/uint16kinX56Y164.txt")
+		val src = Source.fromFile(url.toURI, "utf-8")
+		val expectedKin = src.getLines.drop(1).map(s => s.trim.split('\t'))
+			.filter(_.size == 2).map(arr => arr(1).toDouble).toArray
+		
+		Actor.receive{
+		  	case brightstat: BrightStat => {
+		  		println("Molecules detected: " + brightstat.nMolecules)
+		  		assertEquals(1, brightstat.nMolecules)
+		  		println("Molecule #0 has coordinates: " + brightstat.getCoords(0, 1))
+		  		brightstat.getKinTrace(0).map(_._2.I).zip(expectedKin).foreach(stat => println(stat._2 + "\t" + stat._1))
+		  	}
+		}
 	}
 	
 }

@@ -180,7 +180,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 				i <- (x - pars.ImRad).toInt to (x + pars.ImRad).toInt;
 				j <- (y - pars.ImRad).toInt to (y + pars.ImRad).toInt;
 				if(pars.withinImRange(x - i, y - j))
-			) {molSum += data(y * XDim + x).toDouble; num +=1}
+			) {molSum += data(j * XDim + i).toDouble; num +=1}
 			val molStat = new MolStat
 			molStat.x = x; molStat.y = y
 			molStat.I = molSum - stats.mean * num
