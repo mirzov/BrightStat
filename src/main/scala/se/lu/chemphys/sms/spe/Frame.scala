@@ -148,7 +148,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	
 	def markBrightNonMolecules(maxs: Seq[(Int, Int)], pars: PPars){
 		var stats: PixelStatistics = null
-		def isTooBright(x: Int, y: Int) = !stats.isWithin(data(y * XDim + x).toDouble)
+		def isTooBright(x: Int, y: Int) = stats.isOutside(data(y * XDim + x).toDouble)
 		maxs.foreach{m =>
 			val (x, y) = m
 			if(marks.isEmpty(x, y)){
@@ -165,8 +165,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	}
 	
 	def calcSignals(pixels: Seq[(Int, Int)], pars: PPars, filter: Boolean): Array[MolStat] = {
-		(for(
-			(x, y) <- pixels;
+		for(
+			(x, y) <- pixels.toArray;
 			val stats = {
 						//print("calculating for (" + x + ", " + y + ")...");
 						val stt = calcLocalStat(x, y, pars);
@@ -186,7 +186,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			molStat.I = molSum - stats.mean * num
 			molStat.background = stats.mean * num
 			molStat
-		}).toArray
+		}
 	}
 	
 	def followMolecules(mols: Array[MolStat], pars: PPars): Array[MolStat] = {

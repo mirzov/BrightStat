@@ -38,7 +38,7 @@ class MovieTests extends BrightStatSuite{
 			detected = uint16.getFrame(f).followMolecules(detected, pars)
 		}
 		val gotCoords = detected.map(stat => (stat.x + 1, stat.y + 1)).toArray
-		gotCoords foreach println
+		//gotCoords.foreach(c => println(c._1 + "\t" + c._2))
 		assertEquals(expectedCoords.size, gotCoords.size)
 		val mismatches = gotCoords.zip(expectedCoords).filter(p => p._1 != p._2)
 		mismatches foreach println
@@ -46,22 +46,24 @@ class MovieTests extends BrightStatSuite{
 	}
 
 	@Test def detectMoleculesFromScratchTest(){
-		//molDetectionTest(10)
-		val pars = getPars(10)
-		pars.roi = ROI(85, 153, 92, 159)
-		pars.UseROI = true
-		val (x, y) = (89, 157)
-		val frame = uint16.getFrame(9)
-		println("isCompact = " + frame.isCompact(x, y, pars))
-		println("isSignificant = " + frame.isSignificant(x, y, pars))
-		val detected = uint16.detectMoleculesFromScratch(pars)
-		val gotCoords = detected.map(stat => (stat.x + 1, stat.y + 1)).toArray
-		gotCoords foreach println
+		molDetectionTest(10)
+//		val pars = getPars(10)
+//		pars.roi = ROI(85, 153, 92, 159)
+//		pars.UseROI = true
+//		val (x, y) = (89, 157)
+//		val frame = uint16.getFrame(9)
+//		println("isCompact = " + frame.isCompact(x, y, pars))
+//		println("isSignificant = " + frame.isSignificant(x, y, pars))
+//		val detected = uint16.detectMoleculesFromScratch(pars)
+//		val gotCoords = detected.map(stat => (stat.x + 1, stat.y + 1)).toArray
+//		gotCoords.foreach(c => println(c._1 + "\t" + c._2))
 	}
 	
 	@Test def brightStatCalulationTest(){
 		val pars = getPars(10)
-		pars.roi = ROI(44, 155, 68, 172)
+		//pars.roi = ROI(44, 155, 68, 172)	// small roi
+		pars.roi = ROI(34, 149, 80, 179) 	// medium roi
+		//pars.roi = ROI(10, 113, 112, 210) // large roi
 		pars.UseROI = true
 		val calc = new BrightStatCalculator(uint16, Actor.self, pars, i => ())
 		calc.start()
@@ -73,10 +75,15 @@ class MovieTests extends BrightStatSuite{
 		
 		Actor.receive{
 		  	case brightstat: BrightStat => {
-		  		println("Molecules detected: " + brightstat.nMolecules)
-		  		assertEquals(1, brightstat.nMolecules)
-		  		println("Molecule #0 has coordinates: " + brightstat.getCoords(0, 1))
-		  		brightstat.getKinTrace(0).map(_._2.I).zip(expectedKin).foreach(stat => println(stat._2 + "\t" + stat._1))
+		  		//println("Molecules detected: " + brightstat.nMolecules)
+		  		//assertEquals(1, brightstat.nMolecules)
+		  		//println("Molecule #0 has coordinates: " + brightstat.getCoords(0, 1))
+		  		val trace = brightstat.getKinTrace(0).toArray
+		  		assertEquals(expectedKin.length, trace.length)
+		  		val discrs = for(i <- 0 to trace.length - 1) yield scala.math.abs(trace(i)._2.I - expectedKin(i))
+		  		println("Max difference: " + discrs.max)
+		  		assertTrue(discrs.max < 145)
+		  		//trace.map(_._2.I).zip(expectedKin).foreach(stat => println(stat._2 + "\t" + stat._1))
 		  	}
 		}
 	}

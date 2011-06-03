@@ -11,7 +11,8 @@ class PixelStatistics(values: Seq[Double], pars: PPars) {
 	val mean = if (num == 0) 0d else sum / num
 	val stdev = if (num == 0) 0d else scala.math.sqrt(stDevSum / num - mean * mean)
 	
-	def isWithin(value: Double): Boolean = value < (mean + pars.NoiseSigms * stdev)
+	def isWithin(value: Double): Boolean = value < scala.math.floor(mean + pars.NoiseSigms * stdev)
+	def isOutside(value: Double): Boolean = value > scala.math.floor(mean + pars.NoiseSigms * stdev)
 
 	override def toString = "(Mean = " + mean + ", StdDev = " + stdev + ")"
 }
