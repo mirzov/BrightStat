@@ -7,7 +7,6 @@ class PParsDialog(owner: Window) extends Dialog(owner) {
 
 	modal = true
 	title = "BrightStat preferences"
-	//size = new Dimension(300, 300)
 	
 	private val inputLabels = Seq(
 		("ImRad", 			"Molecule radius"),

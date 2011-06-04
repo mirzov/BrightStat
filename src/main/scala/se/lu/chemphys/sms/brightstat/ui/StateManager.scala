@@ -45,7 +45,7 @@ class StateManager extends SwingWorker {
 		
 		def processing() {
 			toProcessing()
-			val calculator = new BrightStatCalculator(movie, this, pars, i => movieWidget.currentFrame = i)
+			val calculator = new BrightStatCalculator(movie, pars, i => movieWidget.currentFrame = i, bs => this ! bs)
 		  	calculator.start()
 			loop{
 				react{

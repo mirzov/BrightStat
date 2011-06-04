@@ -8,16 +8,16 @@ import scala.actors.Actor
 import se.lu.chemphys.sms.brightstat.NoROI
 import se.lu.chemphys.sms.spe.Movie
 
-class BrightStatCalculator(movie: Movie, parent: Actor, pars: PPars, callBack: Int => Unit) extends SwingWorker{
+class BrightStatCalculator(movie: Movie, pars: PPars, progressCallBack: Int => Unit, finishCallBack: BrightStat => Unit) extends SwingWorker{
   
 	def act(){
 		val brightStat = new BrightStat
-		var molStats = movie.detectMoleculesFromScratch(pars, cancelled, callBack)
+		var molStats = movie.detectMoleculesFromScratch(pars, cancelled, progressCallBack)
 		var f = pars.startFrame + pars.NofStartFrames - 1
 		brightStat.addMolStats(molStats, f)
 		
 		def processFrame(f: Int){
-			callBack(f)
+			progressCallBack(f)
 			val frame = movie.getFrame(f)
 			molStats = frame.followMolecules(molStats, pars)
 			brightStat.addMolStats(molStats, f)
@@ -43,6 +43,6 @@ class BrightStatCalculator(movie: Movie, parent: Actor, pars: PPars, callBack: I
 			f += 1
 		}
 		
-		if (!cancelled) parent ! brightStat
+		if (!cancelled) finishCallBack(brightStat)
 	}
 }

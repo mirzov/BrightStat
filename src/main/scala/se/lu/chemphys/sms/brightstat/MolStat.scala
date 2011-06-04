@@ -69,7 +69,7 @@ class BrightStat {
 	
 	private def printSignalsReport(out: PrintStream, silo:TreeMap[Int, Double]){
 		import BrightStat._
-		improveSignals(silo.values.toArray).foreach(out.println(_))
+		if(!silo.isEmpty) improveSignals(silo.values.toArray).foreach(out.println(_))
 	}
 	def printExSignalsReport(out: PrintStream) = printSignalsReport(out, exSignalsSilo)
 	def printEmSignalsReport(out: PrintStream) = printSignalsReport(out, emSignalsSilo)
