@@ -9,7 +9,9 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 	val startAction = Action("Start!") {Main.state ! "start"}
 	val cancelAction = Action("Cancel!"){Main.state ! "cancel"}
 	val button = new Button{
+		text = "Start!"
 		preferredSize = (90, 25)
+		enabled = false
 	}
 	
 	val dimensionsLabel = new Label("0 x 0 x 0")
@@ -20,19 +22,17 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 	cursorLabel.reactions += {
 		case mm: event.MouseMoved =>
 		  	val coords = movieWidget.movieScreen.lookup(mm.point)
-			cursorLabel.text = format("Cursor at: %d x %d x %d", coords._1, coords._2, movieWidget.currentFrame)
+			cursorLabel.text = "Cursor at: %d x %d x %d".format(coords._1, coords._2, movieWidget.currentFrame)
 		case mex: event.MouseExited => cursorLabel.text = defCursorText
 		case valChange: ValueChanged if valChange.source == movieWidget.movieSlider => cursorLabel.text = defCursorText
 	}
 	val movieParamsPanel = new BoxPanel(Orientation.Vertical){
 		border = CompoundBorder(BeveledBorder(Lowered), EmptyBorder(3))
-		contents += new Label("Movie dimensions")
-		contents += new Label("(XDim x YDim x NFrames):")
-		contents += dimensionsLabel
-		contents += cursorLabel
+		contents ++= List(new Label("Movie dimensions"), new Label("(XDim x YDim x NFrames):"), dimensionsLabel, cursorLabel)
+		xLayoutAlignment = 1
 	}
 	
-	private def ltrbToRoiLegend(l: Int, t: Int, r: Int, b: Int) = format("(%d, %d)-(%d, %d)", l, t, r, b)
+	private def ltrbToRoiLegend(l: Int, t: Int, r: Int, b: Int) = "(%d, %d)-(%d, %d)".format(l, t, r, b)
 	val roiLabel = new Label("(?, ?)-(?, ?)")
 	def setRoi(){
 		val roi = Main.pars.getSafeRoi(Main.movie.XDim, Main.movie.YDim)
@@ -45,13 +45,13 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 	}
 	val roiPanel = new BoxPanel(Orientation.Vertical){
 		border = CompoundBorder(BeveledBorder(Lowered), EmptyBorder(3))
-		contents += new Label("ROI dimensions,")
-		contents += new Label("(left, top)-(right, bottom):")
-		contents += roiLabel
+		contents ++= List(new Label("ROI dimensions,"), new Label("(left, top)-(right, bottom):"), roiLabel)
+		xLayoutAlignment = 1
 	}
 	
 	val setExRoiButton = new Button(){
 		tooltip = "Set Ex signals ROI"
+		preferredSize = (55, 25)
 		action = Action("Ex"){
 			Main.state ! "setexroi"
 		}
@@ -59,24 +59,35 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 
 	val setEmRoiButton = new Button(){
 		tooltip = "Set Em signals ROI"
+		preferredSize = (55, 25)
 		action = Action("Em"){
 			Main.state ! "setemroi"
 		}
 	}
 	
-	val emexRoiButtons = new FlowPanel(setExRoiButton, setEmRoiButton)
+	val emexRoiButtons = new FlowPanel(){
+		contents ++= setExRoiButton :: setEmRoiButton :: Nil
+		maximumSize = (150, 40)
+		xLayoutAlignment = 1
+	}
+	val mainButtonPanel = new BoxPanel(Orientation.NoOrientation){
+		contents ++= Swing.HGlue :: button :: Nil
+	}
+	val topControlsPanel = new BoxPanel(Orientation.Vertical){
+		contents ++= movieParamsPanel :: roiPanel :: emexRoiButtons :: Nil//Swing.VGlue :: mainButtonPanel :: Nil
+	}
 	
-	val controlPanel = new BoxPanel(Orientation.Vertical){
-		border = Swing.EmptyBorder(5)
-		contents += movieParamsPanel
-		contents += roiPanel
-		contents += emexRoiButtons
-		contents += button
+	val controlPanel = new BorderPanel(){
+		border = EmptyBorder(3)
+		import BorderPanel.Position._
+		add(topControlsPanel, North)
+		add(mainButtonPanel, South)
 	}
 	
 	def toReady(){
 		dimensionsLabel.text = Main.movie.XDim + " x " + Main.movie.YDim + " x " + Main.movie.Nframes
 		button.action = startAction
+		//button.enabled = true
 		setRoi()
 	}
 	def toProcessing(){

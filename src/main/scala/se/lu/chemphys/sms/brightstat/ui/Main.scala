@@ -4,7 +4,7 @@ import java.io.File
 import scala.swing.Swing._
 import scala.swing._
 import se.lu.chemphys.sms.brightstat.PPars
-import se.lu.chemphys.sms.spe.{Movie, MovieFromSpeFile}
+import se.lu.chemphys.sms.spe._
 
 object Main extends SimpleSwingApplication with StatefulUiComponent{
 
@@ -29,8 +29,9 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 		pars.UseROI = true
 	}
 	
-	var movieFile: File = null
-	private var _movie: Movie = null
+	var movieFile: Option[File] = None
+	private var _movie: Movie = new DummyMovie
+	movieWidget.initMovie()
 	def movie = _movie 
 	def movie_= (newMovie: Movie){
 		_movie = newMovie
@@ -42,8 +43,8 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 		title = "BrightStat"
 		contents = new BorderPanel(){
 			import BorderPanel.Position._
-			add(controlWidget.controlPanel, East)
 			add(movieWidget.moviePanel, Center)
+			add(controlWidget.controlPanel, East)
 		}
 		menuBar = brightStatMenuBar
 		size = new Dimension(640, 480)
@@ -51,10 +52,10 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	}
 
 	state.start
-	private val url = this.getClass.getResource("/test.SPE")
-	movieFile = new File(url.getFile)
-	movie = new MovieFromSpeFile(movieFile.getAbsolutePath)
-	
+	//private val url = this.getClass.getResource("/test.SPE")
+	//movieFile = new File(url.getFile)
+	//movie = new MovieFromSpeFile(movieFile.getAbsolutePath)
+	//println(controlWidget.emexRoiButtons.size)
 }
 
 

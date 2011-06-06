@@ -63,7 +63,7 @@ class BatchProcessingDialog(pars: PPars, files: Seq[File], owner: Window) extend
 			loopWhile(!activeCalcs.isEmpty){
 				react{
 					case (bs: BrightStat, file: File) => 
-						new BrightStatSaver(bs, file).save()
+						new BrightStatSaver(bs, Some(file)).save()
 						if(!fileQueue.isEmpty) scheduleProcessing(fileQueue.dequeue)
 						if(activeCalcs.isEmpty) close()
 					case "cancel" => activeCalcs.foreach{_.cancelled = true}; close()
@@ -75,14 +75,15 @@ class BatchProcessingDialog(pars: PPars, files: Seq[File], owner: Window) extend
 
 
 class BrightStatProgress(file: File, nFrames: Int, onCancel: => Unit) extends BoxPanel(Orientation.Horizontal){
-
+	border = Swing.EmptyBorder(3)
+	
 	val progrBar = new ProgressBar{
 		min = 1; max = nFrames
 	}
 	val label = new Label(file.getName)
 	val cancButt = new Button(Action("Cancel!")(onCancel))
 	
-	contents ++= label :: progrBar :: cancButt :: Nil
+	contents ++= label :: Swing.HStrut(3) :: progrBar :: Swing.HStrut(3) :: cancButt :: Nil
 	
 	def progress_=(progress: Int){progrBar.value = progress} 
 	def progress = progrBar.value

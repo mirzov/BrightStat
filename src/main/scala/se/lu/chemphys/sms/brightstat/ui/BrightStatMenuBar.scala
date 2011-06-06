@@ -11,7 +11,7 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	
 	private val quitAction = Action("Quit") {Main.state ! "quit"}
 	
-	private var openDir: File = new File("/home/oleg/Documents/ChemPhys/BrightStat/tests")
+	private var openDir: File = null//new File("/home/oleg/Documents/ChemPhys/BrightStat/tests")
 	
 	private val openAction = Action("Open file"){
 		val chooser = new FileChooser(openDir){
@@ -21,12 +21,11 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		val res = chooser.showOpenDialog(this)
 		if(res == FileChooser.Result.Approve){
 			val files = chooser.selectedFiles
+			openDir = files.head.getParentFile
 			files.length match{
-			  	case 0 =>
 			  	case 1 =>
-					openDir = files.head.getParentFile
 					Main.movie = new MovieFromSpeFile(files.head.getAbsolutePath)
-					Main.movieFile = chooser.selectedFile
+					Main.movieFile = Some(chooser.selectedFile)
 			  	case _ =>
 			  	  	val dialog = new BatchProcessingDialog(Main.pars, files, Main.top)
 			  	  	dialog.centerOnScreen()
