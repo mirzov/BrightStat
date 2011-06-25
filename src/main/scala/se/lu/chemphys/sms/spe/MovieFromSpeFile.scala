@@ -62,13 +62,13 @@ class MovieFromSpeFile(filePath: String) extends Movie {
 				val arr: Array[Int] = intBytesToInts(frameBytes.array)
 				new Frame(XDim, YDim, arr)
 			case 2 =>
-				val arr: Array[Short] = shortBytesToShorts(frameBytes.array)
+				val arr: Array[Int] = shortBytesToInts(frameBytes.array)
 				new Frame(XDim, YDim, arr)
 			case 0 =>
 				val arr: Array[Float] = floatBytesToFloats(frameBytes.array)
 				new Frame(XDim, YDim, arr)
 			case 6 =>
-				val arr: Array[Short] = byteBytesToShorts(frameBytes.array)
+				val arr: Array[Int] = byteBytesToInts(frameBytes.array)
 				new Frame(XDim, YDim, arr)
 			case _ => wrongDatatypeException
 		}

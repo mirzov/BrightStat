@@ -38,6 +38,17 @@ object Utils {
 		array
 	}
 
+	def byteBytesToInts(bytes: Array[Byte]): Array[Int] = {
+		val array = new Array[Int](bytes.length)
+		var i = 0;
+		val imax = array.length
+		while(i < imax){
+			array(i) = (bytes(i) & 0x000000ff).toInt
+			i = i + 1
+		}
+		array
+	}
+
 	def intBytesToInts(ints: Array[Byte]): Array[Int] = {
 		val array = new Array[Int](ints.length / 4)
 		var i = 0;

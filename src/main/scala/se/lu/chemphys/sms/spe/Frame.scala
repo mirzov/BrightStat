@@ -2,12 +2,15 @@ package se.lu.chemphys.sms.spe
 
 import se.lu.chemphys.sms.brightstat._
 import java.awt.image.BufferedImage
+import com.azavea.math.Numeric
 
 class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) {
 	import num._
+	import Numeric._
+	implicit val ordering = num.getOrdering
 	val min: T = data.min
 	val max: T = data.max
-	lazy val average: Double = data.map(_.toDouble).sum / XDim / YDim
+	lazy val average: Double = data.map(d => num.toDouble(d)).sum / XDim / YDim
 	def withinRange(i: Int, j: Int): Boolean = (i >= 0 && j >= 0 && i < XDim && j < YDim)
 	def apply(i: Int, j: Int): T = {
 		if(!withinRange(i, j)) throw new IndexOutOfBoundsException("Index is out of range in call to Frame(i, j)")
@@ -50,13 +53,13 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	
 	def shiftToBrightestNeighbor(pixel: (Int, Int)): (Int, Int) = {
 		val (x, y) = pixel
-		var iMax = data(y * XDim + x).toDouble
+		var iMax = data(y * XDim + x)
 		var xmax = x; var ymax = y;
 		var i = x - 1
 		while(i <= x + 1){
 			var j = y - 1
 			while(j <= y + 1){
-				val candidate = data(j * XDim + i).toDouble
+				val candidate = data(j * XDim + i)
 				if(candidate > iMax){
 					xmax = i; ymax = j; iMax = candidate
 				}
@@ -115,7 +118,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			val dist2 = (i - x)*(i - x) + (j - y)*(j - y)
 			if(dist2 <= pars.ImRad * pars.ImRad)
 			{
-				val I = data(j * XDim + i).toDouble
+				val I = num.toDouble(data(j * XDim + i))
 				val dist = math.sqrt(dist2)
 				distaver += dist
 				dist2aver += dist2
@@ -142,13 +145,13 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			i <- (x - pars.SmRad).toInt to (x + pars.SmRad).toInt;
 			j <- (y - pars.SmRad).toInt to (y + pars.SmRad).toInt
 			if(marks.isEmpty(i, j))
-		) yield data(j * XDim + i).toDouble
+		) yield num.toDouble(data(j * XDim + i))
 		new PixelStatistics(pixels, pars)
 	}
 	
 	def markBrightNonMolecules(maxs: Seq[(Int, Int)], pars: PPars){
 		var stats: PixelStatistics = null
-		def isTooBright(x: Int, y: Int) = stats.isOutside(data(y * XDim + x).toDouble)
+		def isTooBright(x: Int, y: Int) = stats.isOutside(data(y * XDim + x))
 		maxs.foreach{m =>
 			val (x, y) = m
 			if(marks.isEmpty(x, y)){
@@ -172,7 +175,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 						val stt = calcLocalStat(x, y, pars);
 						//println(stt);
 						stt}
-			if(!filter || !stats.isWithin(data(y * XDim + x).toDouble))
+			if(!filter || !stats.isWithin(data(y * XDim + x)))
 		) yield {
 			var molSum = 0d
 			var num = 0
@@ -180,7 +183,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 				i <- (x - pars.ImRad).toInt to (x + pars.ImRad).toInt;
 				j <- (y - pars.ImRad).toInt to (y + pars.ImRad).toInt;
 				if(pars.withinImRange(x - i, y - j))
-			) {molSum += data(j * XDim + i).toDouble; num +=1}
+			) {molSum += data(j * XDim + i); num +=1}
 			val molStat = new MolStat
 			molStat.x = x; molStat.y = y
 			molStat.I = molSum - stats.mean * num
@@ -205,14 +208,14 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		assert(sumAccumulator.size == XDim * YDim, 
 		    "Tried to accumulate Frame sum into an incompatible-size array.")
 		for(i <- 0 to sumAccumulator.size - 1){
-			sumAccumulator(i) += data(i).toDouble
+			sumAccumulator(i) += data(i)
 		}
 	}
 	
 	def calcSumInRoi(roi: ROI): Double = {
 		var sum = 0d
 		for(i <- roi.left to roi.right; j <- roi.top to roi.bottom){
-			sum += data(j * XDim + i).toDouble
+			sum += data(j * XDim + i)
 		}
 		sum
 	}
@@ -222,7 +225,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		val array = new Array[Int](XDim * YDim)
 		var i = 0
 		while(i < array.length){
-			val ints = ((255 * (data(i) - min).toDouble) / (max - min).toDouble).toInt
+			val ints = ((255 * num.toDouble(data(i) - min)) / num.toDouble(max - min)).toInt
 			array(i) = ints + (ints << 8) + (ints << 16)
 			i = i + 1
 		}
