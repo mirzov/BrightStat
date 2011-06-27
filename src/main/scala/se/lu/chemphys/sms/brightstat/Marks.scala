@@ -2,7 +2,10 @@ package se.lu.chemphys.sms.brightstat
 
 class Marks(val XDim: Int, val YDim: Int) {
 	
-	private val pixels = new Array[Byte](XDim * YDim)
+	private var pixels = new Array[Byte](XDim * YDim)
+	def reset(){
+		pixels = new Array[Byte](XDim * YDim)
+	}
 	
 	def isEmpty(x: Int, y: Int): Boolean = (pixels(y * XDim + x) == 0)
 	def makeEmpty(x: Int, y: Int){
@@ -27,4 +30,5 @@ class Marks(val XDim: Int, val YDim: Int) {
             if pars.withinImRange(i - x, j - y)
         ) makeMolecule(i, j);
 	}
+	
 }

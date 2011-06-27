@@ -66,8 +66,8 @@ class StateManager extends SwingWorker {
 				react{
 					case "finishselectingroi" => ready()
 					case "noroi" => pars.UseROI = false
-					case roi: java.awt.Rectangle =>
-					  	pars.roi = movieWidget.getRoi
+					case roi: ROI =>
+					  	pars.roi = roi
 						Main.controlWidget.setRoi
 					case _ =>
 				}

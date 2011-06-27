@@ -22,7 +22,7 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 	cursorLabel.reactions += {
 		case mm: event.MouseMoved =>
 		  	val coords = movieWidget.movieScreen.lookup(mm.point)
-			cursorLabel.text = "Cursor at: %d x %d x %d".format(coords._1, coords._2, movieWidget.currentFrame)
+			cursorLabel.text = "Cursor at: %d x %d x %d".format(coords._1 + 1, coords._2 + 1, movieWidget.currentFrame)
 		case mex: event.MouseExited => cursorLabel.text = defCursorText
 		case valChange: ValueChanged if valChange.source == movieWidget.movieSlider => cursorLabel.text = defCursorText
 	}
@@ -38,11 +38,11 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 		val roi = Main.pars.getSafeRoi(Main.movie.XDim, Main.movie.YDim)
 		roiLabel.text = ltrbToRoiLegend(roi.left, roi.top, roi.right, roi.bottom)
 	}
-	def updateRoi(rect: java.awt.Rectangle){
-		val (l, t) = (rect.getX.toInt, rect.getY.toInt)
-		val (r, b) = (l + rect.getWidth.toInt, t + rect.getHeight.toInt)
-		roiLabel.text = ltrbToRoiLegend(l, t, r, b)
-	}
+//	def updateRoi(rect: java.awt.Rectangle){
+//		val (l, t) = (rect.getX.toInt, rect.getY.toInt)
+//		val (r, b) = (l + rect.getWidth.toInt, t + rect.getHeight.toInt)
+//		roiLabel.text = ltrbToRoiLegend(l, t, r, b)
+//	}
 	val roiPanel = new BoxPanel(Orientation.Vertical){
 		border = CompoundBorder(BeveledBorder(Lowered), EmptyBorder(3))
 		contents ++= List(new Label("ROI dimensions,"), new Label("(left, top)-(right, bottom):"), roiLabel)

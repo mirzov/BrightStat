@@ -11,6 +11,8 @@ class MovieFromFrames(frames: IndexedSeq[Frame[_]]) extends Movie {
 	
 	def getFrame(n: Int) = {
 		assert(n >= 1 && n <= Nframes, "Requested frame number is out of bounds.")
-		frames(n - 1)
+		val frame = frames(n - 1)
+		frame.resetMarks()
+		frame
 	}
 }

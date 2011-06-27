@@ -1,10 +1,8 @@
 package se.lu.chemphys.sms.brightstat.ui
 
-import scala.swing._
 import java.awt.image.BufferedImage
-import java.awt.geom.AffineTransform
 import scala.swing.event.ValueChanged
-import se.lu.chemphys.sms.brightstat.ROI
+import scala.swing._
 import se.lu.chemphys.sms.spe.Movie
 
 object MovieWidget{
@@ -20,15 +18,7 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 	def image = _image
 	private def image_=(newImage: BufferedImage){_image = newImage}
 	
-	val roirect = new java.awt.Rectangle()
 	var showRoi = false
-	
-	def getRoi: ROI = {
-		val (left, top) = point2ints(roirect.getLocation)
-		val right = roirect.getWidth.toInt + left
-		val bottom = roirect.getHeight.toInt + top
-		ROI(left, top, right, bottom)
-	}
 	
 	val movieScreen = new MovieScreen(this, state)
   

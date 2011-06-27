@@ -1,12 +1,11 @@
 package se.lu.chemphys.sms.brightstat.ui
-import scala.swing.BorderPanel
-import scala.swing.event
-import java.awt.image.BufferedImage
-import java.awt.geom.AffineTransform
-import java.awt.Graphics2D
-import java.awt.geom.Point2D
-import java.awt.geom.Point2D.{Double => Point}
 import java.awt.geom.Ellipse2D.{Double => Ellipse}
+import java.awt.geom.Point2D.{Double => Point}
+import java.awt.geom.{AffineTransform, Point2D}
+import java.awt.image.BufferedImage
+import java.awt.Graphics2D
+import scala.swing.{BorderPanel, event}
+import se.lu.chemphys.sms.brightstat.ROI
 
 class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel {
 	import MovieWidget._
@@ -24,10 +23,12 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 		val scaleY = height.toDouble / image.getHeight
 		new AffineTransform(scaleX, 0, 0, scaleY, 0, 0)
 	}
+	
 	def lookup(pixel: Point2D) = {
 		val res = transform.inverseTransform(pixel, new Point())
-		(res.getX.toInt + 1, res.getY.toInt + 1)
+		(res.getX.toInt, res.getY.toInt)
 	}
+	
 	override def paint(g: Graphics2D){
 		val curTransf = transform
 		g.drawImage(image, curTransf, null)
@@ -48,6 +49,15 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 		}
 	}
 	
+	private val roirect = new java.awt.Rectangle()
+	private def getRoi: ROI = {
+		val leftTop = roirect.getLocation
+		val (left, top) = lookup(leftTop)
+		val rightBottom = new Point(leftTop.getX + roirect.getWidth, leftTop.getY + roirect.getHeight)
+		val (right, bottom) = lookup(rightBottom)
+		ROI(left, top, right, bottom)
+	}
+	
 	listenTo(mouse.clicks)
 	reactions += {
 		case down: event.MousePressed  =>
@@ -65,7 +75,7 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 		  		state ! "noroi"
 		  		showRoi = false
 		  		repaint
-		  	} else {state ! roirect}
+		  	} else {state ! getRoi}
 		  	state ! "finishselectingroi"
 		  	//println(up)
 	}
