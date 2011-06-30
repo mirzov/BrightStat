@@ -48,8 +48,15 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		dialog.open()
 	}
 	val prefItem = new MenuItem(prefAction)
+	private val settAction = Action("Settings") {
+		val dialog = new SettingsDialog(Main.top)
+		dialog.centerOnScreen()
+		dialog.open()
+	}
+	val settItem = new MenuItem(settAction)
 	contents += new Menu("Edit"){
 		contents += prefItem
+		contents += settItem
 	}
 	
 	private val sumUpAction = Action("Sum the frames up"){
