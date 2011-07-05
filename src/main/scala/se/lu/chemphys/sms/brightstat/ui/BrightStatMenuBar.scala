@@ -72,6 +72,7 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		val mols = frame.detectMolecules(maxs, Main.pars)
 		val screen = Main.movieWidget.movieScreen
 		screen.molsToShow = mols
+		screen.showDetectedMols = true
 		screen.repaint()
 	}
 	val detectMolsItem = new MenuItem(detectMolsAction)

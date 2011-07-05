@@ -22,9 +22,10 @@ class BrightStat {
 		assert(mol >= 0 && mol < nMolecules, "The molecule number is out of range: " + mol)
 		for((frame, molStats) <- molStatsSilo.toSeq) yield (frame, molStats(mol))
 	}
-	def getCoords(mol: Int, frame: Int): (Int, Int) = {
-		val molStat = molStatsSilo(frame)(mol)
-		(molStat.x, molStat.y)
+	def getCoords(mol: Int, frame: Int): Option[(Int, Int)] = {
+		molStatsSilo.get(frame).map(arr => (arr(mol).x, arr(mol).y))
+//		val molStat = molStatsSilo(frame)(mol)
+//		(molStat.x, molStat.y)
 	}
 	
 	def addMolStats(molStats: Array[MolStat], frame: Int){

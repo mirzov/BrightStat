@@ -5,6 +5,7 @@ import scala.swing.Swing._
 import scala.swing._
 import se.lu.chemphys.sms.brightstat.PPars
 import se.lu.chemphys.sms.spe._
+import se.lu.chemphys.sms.brightstat.BrightStat
 
 object Main extends SimpleSwingApplication with StatefulUiComponent{
 
@@ -23,6 +24,8 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	def toProcessing() {
 		statefulUi.foreach(_.toProcessing())
 		pars.startFrame = movieWidget.currentFrame
+		movie.brightStat = None
+		movieWidget.initMolsToShow()
 	}
 	override def toRoiSelection() = {
 		statefulUi.foreach(_.toRoiSelection())
@@ -52,9 +55,9 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	}
 
 	state.start
-//	private val url = this.getClass.getResource("/test.SPE")
-//	movieFile = Some(new File(url.getFile))
-//	movie = new MovieFromSpeFile(movieFile.get.getAbsolutePath)
+	private val url = this.getClass.getResource("/test.SPE")
+	movieFile = Some(new File(url.getFile))
+	movie = new MovieFromSpeFile(movieFile.get.getAbsolutePath)
 	//println(controlWidget.emexRoiButtons.size)
 }
 

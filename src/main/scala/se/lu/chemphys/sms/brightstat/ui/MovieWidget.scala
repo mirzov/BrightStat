@@ -1,8 +1,8 @@
 package se.lu.chemphys.sms.brightstat.ui
 
 import java.awt.image.BufferedImage
-import scala.swing.event.ValueChanged
-import scala.swing._
+import _root_.scala.swing.event.ValueChanged
+import _root_.scala.swing._
 import se.lu.chemphys.sms.spe.Movie
 
 object MovieWidget{
@@ -21,6 +21,12 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 	var showRoi = false
 	
 	val movieScreen = new MovieScreen(this, state)
+
+	def initMolsToShow(){
+		movieScreen.molsToShow = movie.brightStat.toSeq.flatMap{brStat =>
+			(0 to brStat.getNMols-1).flatMap{brStat.getCoords(_, frame)}
+		}
+	}
   
 	val movieSlider = new Slider{
 		orientation = Orientation.Horizontal
@@ -47,6 +53,7 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 		case valChange: ValueChanged if valChange.source == movieSlider => 
 			frame = movieSlider.value
 			image = movie.getFrame(frame).getImage
+			initMolsToShow()
 			movieScreen.repaint
 		}
 	}
@@ -60,6 +67,8 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 	def toReady(){
 		movieSlider.enabled = true
 		movieScreen.deafTo(movieScreen.mouse.moves)
+	  	initMolsToShow()
+	  	movieScreen.repaint()
 	}
 	
 	def toProcessing(){

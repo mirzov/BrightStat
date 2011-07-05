@@ -54,6 +54,7 @@ class StateManager extends SwingWorker {
 					case result: BrightStat => 
 					  	new BrightStatSaver(result, movieFile).save()
 					  	movieWidget.currentFrame = pars.startFrame
+					  	movie.brightStat = Some(result)
 					  	ready()
 					case _ => 
 				}

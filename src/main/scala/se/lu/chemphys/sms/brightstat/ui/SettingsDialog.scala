@@ -21,8 +21,10 @@ class SettingsDialog(owner: Window) extends Dialog(owner) {
 	private val cancelAction = Action("Cancel"){close()}
 	
 	private val okAction = Action("Ok"){
-		Main.movieWidget.movieScreen.showDetectedMols = highlightCheckBox.selected
-		Main.movieWidget.movieScreen.repaint()
+		import Main.movieWidget._
+		initMolsToShow()
+		movieScreen.showDetectedMols = highlightCheckBox.selected
+		movieScreen.repaint()
 		close()
 	}
 	

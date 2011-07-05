@@ -4,16 +4,16 @@ import java.awt.geom.Point2D.{Double => Point}
 import java.awt.geom.{AffineTransform, Point2D}
 import java.awt.image.BufferedImage
 import java.awt.Graphics2D
-import scala.swing.{BorderPanel, event}
+import _root_.scala.swing.{BorderPanel, event}
 import se.lu.chemphys.sms.brightstat.ROI
 
 class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel {
 	import MovieWidget._
 	import widget._
 
-	private var _molsToShow: Seq[(Int, Int)] = Array[(Int, Int)]()
-	def molsToShow = _molsToShow
-	def molsToShow_=(mols: Seq[(Int, Int)]){_molsToShow = mols; showDetectedMols = true}
+	var molsToShow: Seq[(Int, Int)] = Array[(Int, Int)]()
+//	def molsToShow = _molsToShow
+//	def molsToShow_=(mols: Seq[(Int, Int)]){_molsToShow = mols; showDetectedMols = true}
 	var showDetectedMols = false
 	
 	def transform : AffineTransform = {
