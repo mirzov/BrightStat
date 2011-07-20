@@ -21,7 +21,7 @@ class ControlWidget(movieWidget: MovieWidget) extends StatefulUiComponent{
 	cursorLabel.listenTo(movieWidget.movieSlider)
 	cursorLabel.reactions += {
 		case mm: event.MouseMoved =>
-		  	val coords = movieWidget.movieScreen.lookup(mm.point)
+		  	val coords = movieWidget.movieScreen.toCameraPixel(mm.point)
 			cursorLabel.text = "Cursor at: %d x %d x %d".format(coords._1 + 1, coords._2 + 1, movieWidget.currentFrame)
 		case mex: event.MouseExited => cursorLabel.text = defCursorText
 		case valChange: ValueChanged if valChange.source == movieWidget.movieSlider => cursorLabel.text = defCursorText
