@@ -55,9 +55,9 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 	}
 
 	state.start
-	private val url = this.getClass.getResource("/test.SPE")
-	movieFile = Some(new File(url.getFile))
-	movie = new MovieFromSpeFile(movieFile.get.getAbsolutePath)
+	//private val url = this.getClass.getResource("/test.SPE")
+	//movieFile = Some(new File(url.getFile))
+	//movie = new MovieFromSpeFile(movieFile.get.getAbsolutePath)
 	//println(controlWidget.emexRoiButtons.size)
 }
 
