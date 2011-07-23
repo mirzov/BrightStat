@@ -48,8 +48,15 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		dialog.open()
 	}
 	val prefItem = new MenuItem(prefAction)
+	private val settAction = Action("Settings") {
+		val dialog = new SettingsDialog(Main.top)
+		dialog.centerOnScreen()
+		dialog.open()
+	}
+	val settItem = new MenuItem(settAction)
 	contents += new Menu("Edit"){
 		contents += prefItem
+		contents += settItem
 	}
 	
 	private val sumUpAction = Action("Sum the frames up"){
@@ -58,19 +65,34 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		Main.movie = sumMovie
 	}
 	val sumItem = new MenuItem(sumUpAction)
+	
+	private val detectMolsAction = Action("Detect molecules on this frame"){
+		val frame = Main.movie.getFrame(Main.movieWidget.currentFrame)
+		val maxs = frame.detectLocalMaxs(Main.pars)
+		val mols = frame.detectMolecules(maxs, Main.pars)
+		val screen = Main.movieWidget.movieScreen
+		screen.molsToShow = mols
+		screen.showDetectedMols = true
+		screen.repaint()
+	}
+	val detectMolsItem = new MenuItem(detectMolsAction)
+	
 	contents += new Menu("Calculate"){
 		contents += sumItem
+		contents += detectMolsItem
 	}
 	
 	def toReady(){
 		openItem.enabled = true
 		prefItem.enabled = true
 		sumItem.enabled = true
+		detectMolsItem.enabled = true
 	}
 	def toProcessing(){
 		openItem.enabled = false
 		prefItem.enabled = false
 		sumItem.enabled = false
+		detectMolsItem.enabled = false
 	}
 
 	

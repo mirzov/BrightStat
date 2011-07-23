@@ -54,6 +54,7 @@ class StateManager extends SwingWorker {
 					case result: BrightStat => 
 					  	new BrightStatSaver(result, movieFile).save()
 					  	movieWidget.currentFrame = pars.startFrame
+					  	movie.brightStat = Some(result)
 					  	ready()
 					case _ => 
 				}
@@ -66,8 +67,8 @@ class StateManager extends SwingWorker {
 				react{
 					case "finishselectingroi" => ready()
 					case "noroi" => pars.UseROI = false
-					case roi: java.awt.Rectangle =>
-					  	pars.roi = movieWidget.getRoi
+					case roi: ROI =>
+					  	pars.roi = roi
 						Main.controlWidget.setRoi
 					case _ =>
 				}

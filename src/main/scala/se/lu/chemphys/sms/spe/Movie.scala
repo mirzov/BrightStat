@@ -3,12 +3,14 @@ package se.lu.chemphys.sms.spe
 import scala.collection.mutable.ArrayBuffer
 import se.lu.chemphys.sms.brightstat.MolStat
 import se.lu.chemphys.sms.brightstat.PPars
+import se.lu.chemphys.sms.brightstat.BrightStat
 
 trait Movie{
 	val Nframes: Int
 	val XDim: Int
 	val YDim: Int
 	def getFrame(n: Int): Frame[_]
+	var brightStat: Option[BrightStat] = None
 	
 	def sumUpFrames: Frame[Double] = {
 		val sumAccum = new Array[Double](XDim * YDim)

@@ -1,6 +1,6 @@
 import sbt._
 
-class SamplesProject(info: ProjectInfo) extends DefaultProject(info) with IdeaProject with ProguardProject{
+class SamplesProject(info: ProjectInfo) extends DefaultProject(info) with ProguardProject with assembly.AssemblyBuilder{
 
 	val swing =  "org.scala-lang" % "scala-swing" % "2.9.0"
 	val scalaTest = "org.scalatest" % "scalatest_2.9.0" % "1.4.1"

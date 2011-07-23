@@ -17,12 +17,12 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		data(j * XDim + i)
 	}
 	
-	def update(i: Int, j: Int, x: T){
-		if(!withinRange(i, j)) throw new IndexOutOfBoundsException("Index is out of range in call to Frame(i, j)=")
-		data(j * XDim + i) = x
+	private var _marks: Marks = null
+	def marks = {
+		if(_marks == null) _marks = new Marks(XDim, YDim)
+		_marks
 	}
-	
-	lazy val marks = new Marks(XDim, YDim)
+	def resetMarks(){ if(_marks != null) _marks.reset()}
 	
 	def isLocalMax(i: Int, j: Int): Boolean = {
 		i > 0 && j > 0 && i < XDim - 1 && j < YDim - 1  && {

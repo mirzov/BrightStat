@@ -43,7 +43,9 @@ class MovieFromSpeFile(filePath: String) extends Movie {
 	
 	def getFrame(n: Int): Frame[_] = {
 	  //println("Getting frame " + n)
-	  cache.getOrElseUpdate(n, getNewFrame(n))
+		val frame = cache.getOrElseUpdate(n, getNewFrame(n))
+		frame.resetMarks()
+		frame
 	}
 	
 	private def getNewFrame(n: Int): Frame[_] = {

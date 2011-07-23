@@ -22,9 +22,10 @@ class BrightStat {
 		assert(mol >= 0 && mol < nMolecules, "The molecule number is out of range: " + mol)
 		for((frame, molStats) <- molStatsSilo.toSeq) yield (frame, molStats(mol))
 	}
-	def getCoords(mol: Int, frame: Int): (Int, Int) = {
-		val molStat = molStatsSilo(frame)(mol)
-		(molStat.x, molStat.y)
+	def getCoords(mol: Int, frame: Int): Option[(Int, Int)] = {
+		molStatsSilo.get(frame).map(arr => (arr(mol).x, arr(mol).y))
+//		val molStat = molStatsSilo(frame)(mol)
+//		(molStat.x, molStat.y)
 	}
 	
 	def addMolStats(molStats: Array[MolStat], frame: Int){
@@ -54,11 +55,19 @@ class BrightStat {
 	def printIntensityReport(out: PrintStream) = printAnyIntensityReport(out, _.I)
 	def printBackgroundReport(out: PrintStream) = printAnyIntensityReport(out, _.background)
 	
+	def printCoordinatesKineticsReport(out: PrintStream){
+		out.println("Frame" + (1 to getNMols).map(mn => "\tX" + mn + "\tY" + mn).mkString)
+		for((k, v) <- molStatsSilo){
+			out.print(k.toString)
+			out println v.map(stat => "\t%d\t%d".format(stat.x, stat.y)).mkString
+		}
+	}
+	
 	def printCoordinatesReport(frame: Int, out: PrintStream){
 		out.println("Molecule\tX\tY")
 		val molStats = molStatsSilo(frame)
 		for(i <- 0 to molStats.size - 1){
-			out.println((i+1).toString + "\t" + (molStats(i).x + 1) + "\t" + (molStats(i).y + 1))
+			out.println((i+1) + "\t" + (molStats(i).x + 1) + "\t" + (molStats(i).y + 1))
 		}
 	}
 	

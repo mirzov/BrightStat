@@ -13,6 +13,7 @@ sealed trait ROI{
 		val ib = that.bottom.min(bottom)
 		ROI(il, it, ir, ib)
 	}
+	override def toString = ("(%d, %d, %d, %d)".format(left, top, right, bottom))
 }
 
 object ROI{

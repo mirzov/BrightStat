@@ -23,6 +23,7 @@ class BrightStatSaver(brightStat: BrightStat, moviePath: Option[File]) {
 			printReport(suffixedFile("coor"), _.printCoordinatesReport)
 			printReport(suffixedFile("kin"), _.printIntensityReport)
 			printReport(suffixedFile("bkgr"), _.printBackgroundReport)
+			printReport(suffixedFile("coor_kin"), _.printCoordinatesKineticsReport)
 			
 			printReport(new File(resFolder, "SignalsEx.txt"), _.printExSignalsReport)
 			printReport(new File(resFolder, "SignalsEm.txt"), _.printEmSignalsReport)
