@@ -2,14 +2,15 @@ package se.lu.chemphys.sms.spe
 
 import se.lu.chemphys.sms.brightstat._
 import java.awt.image.BufferedImage
-import com.azavea.math.Numeric
+import com.azavea.math._
 
 class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) {
 	import num._
-	import Numeric._
-	implicit val ordering = num.getOrdering
-	val min: T = data.min
-	val max: T = data.max
+	//import Numeric._
+	//import Implicits._
+	val ordering = getOrdering()
+	val min: T = data.min(ordering)
+	val max: T = data.max(ordering)
 	lazy val average: Double = data.map(d => num.toDouble(d)).sum / XDim / YDim
 	def withinRange(i: Int, j: Int): Boolean = (i >= 0 && j >= 0 && i < XDim && j < YDim)
 	def apply(i: Int, j: Int): T = {
@@ -30,7 +31,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			while((i0 <= 1)) {
 				var j0 = -1;
 				while((j0 <= 1)){
-					if (((i0 | j0) != 0) && (data(j*XDim + i) <= data((j + j0)*XDim + i + i0))) return false;
+					if (((i0 | j0) != 0) && num.lteq(data(j*XDim + i), data((j + j0)*XDim + i + i0))) return false;
 					j0 = j0 + 1
 				}
 				i0 = i0 + 1
@@ -60,7 +61,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			var j = y - 1
 			while(j <= y + 1){
 				val candidate = data(j * XDim + i)
-				if(candidate > iMax){
+				if(num.gt(candidate, iMax)){
 					xmax = i; ymax = j; iMax = candidate
 				}
 				j += 1
@@ -77,7 +78,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			for(pix <- seed){
 				for(m <- (pix._1 - 1) to (pix._1 + 1); n <- (pix._2 - 1) to (pix._2 + 1) if(withinRange(m, n))){
 					val int = data(n * XDim + m)
-					if(int > maxInt){
+					if(num.gt(int, maxInt)){
 						val coords = (m, n)
 						if(!seed.contains(coords)) {maxInt = int; maxCoord = coords}
 					}
@@ -178,16 +179,16 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 			if(!filter || !stats.isWithin(data(y * XDim + x)))
 		) yield {
 			var molSum = 0d
-			var num = 0
+			var n = 0
 			for(
 				i <- (x - pars.ImRad).toInt to (x + pars.ImRad).toInt;
 				j <- (y - pars.ImRad).toInt to (y + pars.ImRad).toInt;
 				if(pars.withinImRange(x - i, y - j))
-			) {molSum += data(j * XDim + i); num +=1}
+			) {molSum += num.toDouble(data(j * XDim + i)); n +=1}
 			val molStat = new MolStat
 			molStat.x = x; molStat.y = y
-			molStat.I = molSum - stats.mean * num
-			molStat.background = stats.mean * num
+			molStat.background = stats.mean * n
+			molStat.I = molSum - molStat.background
 			molStat
 		}
 	}
@@ -225,7 +226,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 		val array = new Array[Int](XDim * YDim)
 		var i = 0
 		while(i < array.length){
-			val ints = ((255 * num.toDouble(data(i) - min)) / num.toDouble(max - min)).toInt
+			val fullRange = num.toDouble(num.minus(max, min))
+			val ints = ((255 * num.toDouble(num.minus(data(i), min))) / fullRange).toInt
 			array(i) = ints + (ints << 8) + (ints << 16)
 			i = i + 1
 		}

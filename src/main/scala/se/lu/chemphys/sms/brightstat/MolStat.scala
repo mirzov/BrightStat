@@ -8,6 +8,7 @@ class MolStat {
 	var y = 0
 	var I = 0d
 	var background = 0d
+	override def toString = "(%d, %d, %f)".format(x, y, I)
 }
 
 class BrightStat {

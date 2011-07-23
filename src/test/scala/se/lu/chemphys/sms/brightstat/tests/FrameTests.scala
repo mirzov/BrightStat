@@ -91,15 +91,15 @@ class FrameTests extends BrightStatSuite{
 
 	@Test def frameTests4(){
 		val frame = byte.getFrame(2)
-		assertEquals(39.toShort, frame(94, 119))
-		assertEquals(205.toShort, frame(105, 108))
+		assertEquals(39, frame(94, 119))
+		assertEquals(205, frame(105, 108))
 	}
 
 	@Test def frameTests5(){
 		val frame = int16.getFrame(3)
-		assertEquals((-217).toShort, frame(0, 0))
-		assertEquals((-41).toShort, frame(199, 192))
-		assertEquals(225.toShort, frame(154, 104))
+		assertEquals(-217, frame(0, 0))
+		assertEquals(-41, frame(199, 192))
+		assertEquals(225, frame(154, 104))
 	}
 
 	@Test def frameTests6(){

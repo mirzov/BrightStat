@@ -10,10 +10,11 @@ import scala.math.{abs, min, max, pow}
 /**
  * Numeric typeclass for doing operations on generic types.
  *
- * Importantly, this package does not deliver classes for you to instantiate. Rather,
- * it gives you a trait to associated with your generic types, which allows actual
- * uses of your generic code with concrete types (e.g. Int) to link up with concrete
- * implementations (e.g. IntIsNumeric) of Numeric's method for that type.
+ * Importantly, this package does not deliver classes for you to instantiate.
+ * Rather, it gives you a trait to associated with your generic types, which
+ * allows actual uses of your generic code with concrete types (e.g. Int) to
+ * link up with concrete implementations (e.g. IntIsNumeric) of Numeric's
+ * method for that type.
  *
  * @example {{{
  *   import demo.Numeric
@@ -28,7 +29,8 @@ import scala.math.{abs, min, max, pow}
  * }}}
  * 
  */
-trait Numeric[@specialized A] extends ConvertableFrom[A] with ConvertableTo[A] {
+trait Numeric[@specialized(Int,Long,Float,Double) A]
+extends ConvertableFrom[A] with ConvertableTo[A] {
 
   /**
    * Computes the absolute value of `a`.
@@ -210,11 +212,19 @@ trait Numeric[@specialized A] extends ConvertableFrom[A] with ConvertableTo[A] {
   def getOrdering():Ordering[A] = new NumericOrdering(this)
 }
 
+/**
+ * This is a little helper class that allows us to support the Ordering trait.
+ *
+ * If Numeric extended Ordering directly then we'd have to override all of
+ * the comparison operators, losing specialization and other performance
+ * benefits.
+ */
 class NumericOrdering[A](n:Numeric[A]) extends Ordering[A] {
   def compare(a:A, b:A) = n.compare(a, b)
 }
 
-trait IntIsNumeric extends Numeric[Int] with ConvertableFromInt with ConvertableToInt {
+trait IntIsNumeric
+extends Numeric[Int] with ConvertableFromInt with ConvertableToInt {
   def abs(a:Int): Int = scala.math.abs(a)
   def div(a:Int, b:Int): Int = a / b
   def equiv(a:Int, b:Int): Boolean = a == b
@@ -236,7 +246,8 @@ trait IntIsNumeric extends Numeric[Int] with ConvertableFromInt with Convertable
   def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toInt(b)
 }
 
-trait LongIsNumeric extends Numeric[Long] with ConvertableFromLong with ConvertableToLong {
+trait LongIsNumeric
+extends Numeric[Long] with ConvertableFromLong with ConvertableToLong {
   def abs(a:Long): Long = scala.math.abs(a)
   def div(a:Long, b:Long): Long = a / b
   def equiv(a:Long, b:Long): Boolean = a == b
@@ -258,7 +269,8 @@ trait LongIsNumeric extends Numeric[Long] with ConvertableFromLong with Converta
   def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toLong(b)
 }
 
-trait FloatIsNumeric extends Numeric[Float] with ConvertableFromFloat with ConvertableToFloat {
+trait FloatIsNumeric
+extends Numeric[Float] with ConvertableFromFloat with ConvertableToFloat {
   def abs(a:Float): Float = scala.math.abs(a)
   def div(a:Float, b:Float): Float = a / b
   def equiv(a:Float, b:Float): Boolean = a == b
@@ -280,7 +292,8 @@ trait FloatIsNumeric extends Numeric[Float] with ConvertableFromFloat with Conve
   def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toFloat(b)
 }
 
-trait DoubleIsNumeric extends Numeric[Double] with ConvertableFromDouble with ConvertableToDouble {
+trait DoubleIsNumeric
+extends Numeric[Double] with ConvertableFromDouble with ConvertableToDouble {
   def abs(a:Double): Double = scala.math.abs(a)
   def div(a:Double, b:Double): Double = a / b
   def equiv(a:Double, b:Double): Boolean = a == b
@@ -302,13 +315,80 @@ trait DoubleIsNumeric extends Numeric[Double] with ConvertableFromDouble with Co
   def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toDouble(b)
 }
 
-object Numeric {
-  implicit def infixNumericOps[@specialized A:Numeric](a:A):NumericOps[A] = new NumericOpsCls(a)
+trait BigIntIsNumeric
+extends Numeric[BigInt] with ConvertableFromBigInt with ConvertableToBigInt {
+  def abs(a:BigInt): BigInt = a.abs
+  def div(a:BigInt, b:BigInt): BigInt = a / b
+  def equiv(a:BigInt, b:BigInt): Boolean = a == b
+  def gt(a:BigInt, b:BigInt): Boolean = a > b
+  def gteq(a:BigInt, b:BigInt): Boolean = a >= b
+  def lt(a:BigInt, b:BigInt): Boolean = a < b
+  def lteq(a:BigInt, b:BigInt): Boolean = a <= b
+  def max(a:BigInt, b:BigInt): BigInt = a.max(b)
+  def min(a:BigInt, b:BigInt): BigInt = a.min(b)
+  def minus(a:BigInt, b:BigInt): BigInt = a - b
+  def mod(a:BigInt, b:BigInt): BigInt = a % b
+  def negate(a:BigInt): BigInt = -a
+  def one: BigInt = BigInt(1)
+  def plus(a:BigInt, b:BigInt): BigInt = a + b
+  def pow(a:BigInt, b:BigInt): BigInt = a.pow(b)
+  def times(a:BigInt, b:BigInt): BigInt = a * b
+  def zero: BigInt = BigInt(0)
+  
+  def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toBigInt(b)
+}
 
-  def numeric[@specialized A:Numeric]() = implicitly[Numeric[A]]
+trait BigDecimalIsNumeric
+extends Numeric[BigDecimal] with ConvertableFromBigDecimal with ConvertableToBigDecimal {
+  def abs(a:BigDecimal): BigDecimal = a.abs
+  def div(a:BigDecimal, b:BigDecimal): BigDecimal = a / b
+  def equiv(a:BigDecimal, b:BigDecimal): Boolean = a == b
+  def gt(a:BigDecimal, b:BigDecimal): Boolean = a > b
+  def gteq(a:BigDecimal, b:BigDecimal): Boolean = a >= b
+  def lt(a:BigDecimal, b:BigDecimal): Boolean = a < b
+  def lteq(a:BigDecimal, b:BigDecimal): Boolean = a <= b
+  def max(a:BigDecimal, b:BigDecimal): BigDecimal = a.max(b)
+  def min(a:BigDecimal, b:BigDecimal): BigDecimal = a.min(b)
+  def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
+  def mod(a:BigDecimal, b:BigDecimal): BigDecimal = a % b
+  def negate(a:BigDecimal): BigDecimal = -a
+  def one: BigDecimal = BigDecimal(1.0)
+  def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
+  def pow(a:BigDecimal, b:BigDecimal): BigDecimal = a.pow(b)
+  def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
+  def zero: BigDecimal = BigDecimal(0.0)
+  
+  def fromType[@specialized B](b:B)(implicit c:ConvertableFrom[B]) = c.toBigDecimal(b)
+}
+
+
+/**
+ * This companion object provides the instances (e.g. IntIsNumeric)
+ * associating the type class (Numeric) with its member type (Int).
+ */
+object Numeric {
+  def numeric[@specialized(Int, Long, Float, Double) A:Numeric]():Numeric[A] = implicitly[Numeric[A]]
 
   implicit object IntIsNumeric extends IntIsNumeric
   implicit object LongIsNumeric extends LongIsNumeric
   implicit object FloatIsNumeric extends FloatIsNumeric
   implicit object DoubleIsNumeric extends DoubleIsNumeric
+}
+
+/**
+ * This object contains useful implicits to turn on infix operators
+ * and other sugar.
+ *
+ * You can enable these via:
+ *   import com.azavea.math.Implicits._
+ */
+object Implicits {
+  implicit def infixNumericOps[@specialized(Int, Long, Float, Double) A:Numeric](a:A):NumericOps[A] = new NumericOps(a)
+
+  implicit def infixIntOps(i:Int):IntOps = new IntOps(i)
+  implicit def infixLongOps(l:Long):LongOps = new LongOps(l)
+  implicit def infixFloatOps(f:Float):FloatOps = new FloatOps(f)
+  implicit def infixDoubleOps(d:Double):DoubleOps = new DoubleOps(d)
+
+  def numeric[@specialized(Int, Long, Float, Double) A:Numeric]():Numeric[A] = implicitly[Numeric[A]]
 }

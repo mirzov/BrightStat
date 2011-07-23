@@ -82,7 +82,7 @@ class MovieTests extends BrightStatSuite{
 		  		val trace = brightstat.getKinTrace(0).toArray
 		  		assertEquals(expectedKin.length, trace.length)
 		  		val discrs = for(i <- 0 to trace.length - 1) yield scala.math.abs(trace(i)._2.I - expectedKin(i))
-		  		println("Max difference: " + discrs.max)
+		  		//println("Max difference: " + discrs.max)
 		  		assertTrue(discrs.max < 145)
 		  		//trace.map(_._2.I).zip(expectedKin).foreach(stat => println(stat._2 + "\t" + stat._1))
 		  	}
