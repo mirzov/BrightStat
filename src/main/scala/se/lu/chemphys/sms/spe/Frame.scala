@@ -2,6 +2,7 @@ package se.lu.chemphys.sms.spe
 
 import se.lu.chemphys.sms.brightstat._
 import java.awt.image.BufferedImage
+import _root_.scala.collection.mutable.Set
 
 class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(implicit num: Numeric[T]) {
 	import num._
@@ -80,7 +81,8 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 					}
 				}
 			}
-			seed + maxCoord
+			seed += maxCoord
+			seed
 		}
 		var res = Set((i, j))
 		for(n <- 1 to (number - 1)) res = addNext(res)
