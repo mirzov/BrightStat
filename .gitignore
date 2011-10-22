@@ -1,5 +1,7 @@
 .manager/*
 .scala_dependencies
+.cache
+.settings
 project/boot
 project/project
 project/target

@@ -1,3 +1,5 @@
+import AssemblyKeys._
+
 name := "BrightStat"
 
 version := "2.0"
@@ -8,7 +10,7 @@ libraryDependencies ++= Seq(
 	"junit" % "junit" % "4.8.2"
 )
 
-seq(sbtassembly.Plugin.assemblySettings: _*)
+seq(assemblySettings: _*)
 
 fork in run := true
 
