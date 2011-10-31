@@ -24,7 +24,7 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 
 	def initMolsToShow(){
 		movieScreen.molsToShow = movie.brightStat.toSeq.flatMap{brStat =>
-			(0 to brStat.getNMols-1).flatMap{brStat.getCoords(_, frame)}
+			(0 to brStat.nMolecules-1).flatMap{brStat.getCoords(_, frame)}
 		}
 	}
   

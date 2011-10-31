@@ -1,17 +1,15 @@
 package se.lu.chemphys.sms.brightstat.ui
 
 import se.lu.chemphys.sms.spe.{Utils, Frame}
-import se.lu.chemphys.sms.brightstat.PPars
-import se.lu.chemphys.sms.brightstat.BrightStat
+import se.lu.chemphys.sms.brightstat._
 import scala.swing.SwingWorker
 import scala.actors.Actor
-import se.lu.chemphys.sms.brightstat.NoROI
 import se.lu.chemphys.sms.spe.Movie
 
 class BrightStatCalculator(movie: Movie, pars: PPars, progressCallBack: Int => Unit, finishCallBack: BrightStat => Unit) extends SwingWorker{
   
 	def act(){
-		val brightStat = new BrightStat
+		val brightStat = new DefaultBrightStat()
 		var molStats = movie.detectMoleculesFromScratch(pars, cancelled, progressCallBack)
 		var f = pars.startFrame + pars.NofStartFrames - 1
 		brightStat.addMolStats(molStats, f)
