@@ -69,7 +69,7 @@ class StateManager extends SwingWorker {
 					case "noroi" => pars.UseROI = false
 					case roi: ROI =>
 					  	pars.roi = roi
-						Main.controlWidget.setRoi
+						controlWidget.setRoi
 					case _ =>
 				}
 			}

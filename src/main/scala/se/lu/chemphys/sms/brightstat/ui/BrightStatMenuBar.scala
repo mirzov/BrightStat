@@ -6,6 +6,7 @@ import se.lu.chemphys.sms.spe.Movie
 import scala.swing._
 import scala.collection.mutable.Seq
 import se.lu.chemphys.sms.spe.MovieFromFrames
+import se.lu.chemphys.sms.brightstat.DefaultBrightStat
 
 class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	
@@ -24,8 +25,9 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 			openDir = files.head.getParentFile
 			files.length match{
 			  	case 1 =>
-					Main.movie = new MovieFromSpeFile(files.head.getAbsolutePath)
+					Main.movie = new MovieFromSpeFile(chooser.selectedFile.getAbsolutePath)
 					Main.movieFile = Some(chooser.selectedFile)
+					Main.movie.brightStat = Some(new DefaultBrightStat(chooser.selectedFile))
 			  	case _ =>
 			  	  	val dialog = new BatchProcessingDialog(Main.pars, files, Main.top)
 			  	  	dialog.centerOnScreen()
