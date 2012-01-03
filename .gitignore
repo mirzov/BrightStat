@@ -2,6 +2,7 @@
 .scala_dependencies
 .cache
 .settings
+.classpath
 project/boot
 project/project
 project/target
