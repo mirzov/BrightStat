@@ -5,16 +5,15 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.Point2D
 import java.awt.Graphics2D
 import java.awt.Rectangle
-
 import scala.swing.BorderPanel
 import scala.swing.event
-
 import MovieScreen.lookup
 import MovieScreen.rectToROI
 import MovieScreen.roiToRect
 import MovieWidget.point2ints
 import se.lu.chemphys.sms.brightstat.NoROI
 import se.lu.chemphys.sms.brightstat.ROI
+import java.awt.event.MouseEvent
 
 object MovieScreen{
 
@@ -45,7 +44,7 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 	import MovieScreen._
 	import widget._
 
-	var molsToShow: Seq[(Int, Int)] = Array[(Int, Int)]()
+	var molsToShow: MoleculesToShow = new NoMoleculesToShow()
 	var showDetectedMols = false
 	
 	def transform : AffineTransform = {
@@ -64,13 +63,18 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 			g.draw(roirect)
 		}
 		if(showDetectedMols){
-			val centerPoints = molsToShow.map{m => 
-				curTransf.transform(new Point(m._1 + .5, m._2 + .5), new Point())
+		    def setColor(mol: MoleculeStatus){
+		      val color = if(mol.save) java.awt.Color.GREEN else java.awt.Color.RED
+		      g.setColor(color)
+		    }
+			def centerPoint(m: MoleculeStatus): java.awt.geom.Point2D = { 
+				curTransf.transform(new Point(m.x + .5, m.y + .5), new Point())
 			}
-			g.setColor(java.awt.Color.RED)
 			val radX = curTransf.getScaleX * Main.pars.ImRad
 			val radY = curTransf.getScaleY * Main.pars.ImRad
-			centerPoints.foreach{pnt =>
+			molsToShow.foreach{mol =>
+			  	val pnt = centerPoint(mol)
+			  	setColor(mol)
 				g.draw(new Ellipse(pnt.getX - radX, pnt.getY - radY, radX * 2, radY * 2))
 			}
 		}
@@ -84,7 +88,14 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 	
 	listenTo(mouse.clicks, this)
 	reactions += {
-		case down: event.MousePressed  =>
+		case right: event.MousePressed if(right.peer.getButton == MouseEvent.BUTTON3) =>
+		  println("Right click detected!")
+		  val (x, y) = toCameraPixel(right.point)
+		  molsToShow.getMoleculeInRange(x, y, Main.pars.ImRad).foreach{ i =>
+		    molsToShow(i) = !molsToShow(i).save
+		    repaint()
+		  }
+		case down: event.MousePressed if(down.peer.getButton == MouseEvent.BUTTON1) =>
 		  	val (x, y) = point2ints(down.point)
 			roirect.setBounds(x, y, 0, 0)
 			state ! "selectroi"

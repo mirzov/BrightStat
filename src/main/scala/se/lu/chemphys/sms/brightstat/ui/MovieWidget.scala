@@ -23,9 +23,10 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 	val movieScreen = new MovieScreen(this, state)
 
 	def initMolsToShow(){
-		movieScreen.molsToShow = movie.brightStat.toSeq.flatMap{brStat =>
+		val coords = movie.brightStat.toSeq.flatMap{brStat =>
 			(0 to brStat.nMolecules-1).flatMap{brStat.getCoords(_, frame)}
 		}
+		movieScreen.molsToShow = movieScreen.molsToShow.replaceCoordinates(coords)
 	}
   
 	val movieSlider = new Slider{

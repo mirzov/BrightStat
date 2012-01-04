@@ -73,7 +73,7 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 		val maxs = frame.detectLocalMaxs(Main.pars)
 		val mols = frame.detectMolecules(maxs, Main.pars)
 		val screen = Main.movieWidget.movieScreen
-		screen.molsToShow = mols
+		screen.molsToShow = screen.molsToShow.replaceCoordinates(mols)
 		screen.showDetectedMols = true
 		screen.repaint()
 	}
@@ -82,6 +82,21 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	contents += new Menu("Calculate"){
 		contents += sumItem
 		contents += detectMolsItem
+	}
+	
+	private val deselectAllAction = Action("Deselect all molecules"){
+	  Main.movieWidget.movieScreen.molsToShow.deselectAll
+	  Main.movieWidget.movieScreen.repaint()
+	}
+	
+	private val selectAllAction = Action("Select all molecules"){
+	  Main.movieWidget.movieScreen.molsToShow.selectAll
+	  Main.movieWidget.movieScreen.repaint()
+	}
+	
+	contents += new Menu("Select"){
+		contents += new MenuItem(selectAllAction)
+		contents += new MenuItem(deselectAllAction)
 	}
 	
 	def toReady(){
