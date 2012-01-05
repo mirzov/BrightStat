@@ -6,10 +6,10 @@ import scala.collection.mutable.ArrayBuffer
 
 trait BrightStat {
 
-	protected var molStatsSilo: TreeMap[Int, Array[MolStat]]
-	protected var exSignalsSilo: TreeMap[Int, Double]
-	protected var emSignalsSilo: TreeMap[Int, Double]
-	protected var nMols : Int
+	protected var molStatsSilo = TreeMap[Int, Array[MolStat]]()
+	protected var exSignalsSilo = TreeMap[Int, Double]()
+	protected var emSignalsSilo = TreeMap[Int, Double]()
+	protected var nMols = 0
 	
 	def nMolecules = nMols
 	def getKinTrace(mol: Int): Seq[(Int, MolStat)] = {
@@ -74,6 +74,15 @@ trait BrightStat {
 	}
 	def printExSignalsReport(out: PrintStream) = printSignalsReport(out, exSignalsSilo)
 	def printEmSignalsReport(out: PrintStream) = printSignalsReport(out, emSignalsSilo)
+	
+	def removeMolecules(nums: Seq[Int]){
+	  molStatsSilo = molStatsSilo.map{ pair =>
+	    val (frame, mols) = pair
+	    val newMols = (0 to nMols - 1).toArray.diff(nums).map(mols(_))
+	    (frame, newMols)
+	  }
+	  for((frame, mols) <- molStatsSilo.headOption) nMols = mols.length
+	}
 }
 
 object BrightStat{

@@ -27,9 +27,12 @@ object Main extends SimpleSwingApplication with StatefulUiComponent{
 		movie.brightStat = None
 		movieWidget.initMolsToShow()
 	}
-	override def toRoiSelection() = {
+	override def toRoiSelection(){
 		statefulUi.foreach(_.toRoiSelection())
 		pars.UseROI = true
+	}
+	override def toInitial(){
+		statefulUi.foreach(_.toInitial())
 	}
 	
 	var movieFile: Option[File] = None

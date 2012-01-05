@@ -1,6 +1,6 @@
 package se.lu.chemphys.sms.brightstat.ui
 
-class MoleculeStatus(val x: Int, val y: Int, val save: Boolean ){
+class MoleculeStatus(val x: Int, val y: Int, val selected: Boolean ){
   
   def this(xy: (Int, Int)) = this(xy._1, xy._2, true)
   
@@ -50,11 +50,16 @@ trait MoleculesToShow extends IndexedSeq[MoleculeStatus]{
     saveStates(i) = value
   }
   
-  def deselectAll {
+  def deselectAll() {
     saveStates = Array.fill(coords.length)(false)
   }
   
-  def selectAll {
+  def selectAll() {
     saveStates = Array.fill(coords.length)(true)
+  }
+  
+  def keepOnlySelected() {
+    coords = (0 to coords.length - 1).toIndexedSeq.filter(saveStates(_)).map(coords(_))
+    selectAll
   }
 }

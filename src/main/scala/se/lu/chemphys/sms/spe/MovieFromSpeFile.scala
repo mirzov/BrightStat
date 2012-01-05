@@ -9,6 +9,8 @@ import java.nio.channels.FileChannel
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import scala.collection.mutable.WeakHashMap
+import se.lu.chemphys.sms.brightstat.DefaultBrightStat
+import java.io.File
 
 class MovieFromSpeFile(filePath: String) extends Movie {
 	private val file: FileChannel = new FileInputStream(filePath).getChannel
@@ -17,6 +19,8 @@ class MovieFromSpeFile(filePath: String) extends Movie {
 		file.close()
 	}
 
+	brightStat = Some(new DefaultBrightStat(new File(filePath)))
+	
 	val headerLength = 4100
 	private val headerBytes = ByteBuffer.allocate(headerLength)
 	file.read(headerBytes)

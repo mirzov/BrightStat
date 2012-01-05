@@ -6,25 +6,31 @@ import java.io.PrintStream
 class BrightStatSaver(brightStat: BrightStat, moviePath: Option[File]) {
 	import BrightStatSaver._
 	
+	private def printReport(file: File, reportSelector: BrightStat => PrintStream => Unit){
+		val stream = new java.io.FileOutputStream(file)
+		reportSelector(brightStat)(new PrintStream(stream))
+		stream.close
+	}
+	
 	def save(){
-		moviePath.foreach{ mPath =>
+		for(mPath <- moviePath){
 			val resFolder = getOutputFolder(mPath)
 			resFolder.mkdir
-			
-			def printReport(file: File, reportSelector: BrightStat => PrintStream => Unit){
-				val stream = new java.io.FileOutputStream(file)
-				reportSelector(brightStat)(new PrintStream(stream))
-				stream.close
-			}
-			
-			printReport(coordinatesFile(mPath), _.printCoordinatesReport)
-			printReport(kineticsFile(mPath), _.printIntensityReport)
-			printReport(backgroundFile(mPath), _.printBackgroundReport)
-			printReport(coordKinFile(mPath), _.printCoordinatesKineticsReport)
-			
+			printMoleculeReports(mPath)
 			printReport(new File(resFolder, "SignalsEx.txt"), _.printExSignalsReport)
 			printReport(new File(resFolder, "SignalsEm.txt"), _.printEmSignalsReport)
 		}
+	}
+	
+	def rewriteMoleculeReports(){
+	  for(mPath <- moviePath) printMoleculeReports(mPath)
+	}
+	
+	private def printMoleculeReports(mPath: File){
+		printReport(coordinatesFile(mPath), _.printCoordinatesReport)
+		printReport(kineticsFile(mPath), _.printIntensityReport)
+		printReport(backgroundFile(mPath), _.printBackgroundReport)
+		printReport(coordKinFile(mPath), _.printCoordinatesKineticsReport)
 	}
 }
 

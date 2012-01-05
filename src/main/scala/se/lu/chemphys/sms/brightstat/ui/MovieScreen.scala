@@ -45,7 +45,7 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 	import widget._
 
 	var molsToShow: MoleculesToShow = new NoMoleculesToShow()
-	var showDetectedMols = false
+	var showDetectedMols = true
 	
 	def transform : AffineTransform = {
 		val scaleX = size.width.toDouble / image.getWidth
@@ -64,7 +64,7 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 		}
 		if(showDetectedMols){
 		    def setColor(mol: MoleculeStatus){
-		      val color = if(mol.save) java.awt.Color.GREEN else java.awt.Color.RED
+		      val color = if(mol.selected) java.awt.Color.GREEN else java.awt.Color.RED
 		      g.setColor(color)
 		    }
 			def centerPoint(m: MoleculeStatus): java.awt.geom.Point2D = { 
@@ -89,10 +89,9 @@ class MovieScreen(widget: MovieWidget, state: StateManager) extends BorderPanel 
 	listenTo(mouse.clicks, this)
 	reactions += {
 		case right: event.MousePressed if(right.peer.getButton == MouseEvent.BUTTON3) =>
-		  println("Right click detected!")
 		  val (x, y) = toCameraPixel(right.point)
 		  molsToShow.getMoleculeInRange(x, y, Main.pars.ImRad).foreach{ i =>
-		    molsToShow(i) = !molsToShow(i).save
+		    molsToShow(i) = !molsToShow(i).selected
 		    repaint()
 		  }
 		case down: event.MousePressed if(down.peer.getButton == MouseEvent.BUTTON1) =>
