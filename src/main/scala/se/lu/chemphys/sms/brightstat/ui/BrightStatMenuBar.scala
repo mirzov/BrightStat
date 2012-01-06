@@ -11,7 +11,7 @@ import se.lu.chemphys.sms.brightstat.BrightStatSaver
 
 class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	
-	private var openDir: File = new File("/home/oleg/Documents/ChemPhys/BrightStat/tests")
+	private var openDir: File = null//new File("/home/oleg/Documents/ChemPhys/BrightStat/tests")
 	
 	private val openAction = Action("Open file"){
 		val chooser = new FileChooser(openDir){
@@ -40,11 +40,16 @@ class BrightStatMenuBar extends MenuBar with StatefulUiComponent{
 	  for(bs <- Main.movie.brightStat){
 	    val molsShow = Main.movieWidget.movieScreen.molsToShow
 	    val toRemove = (0 to molsShow.length - 1).toArray.filter(!molsShow(_).selected)
-	    bs.removeMolecules(toRemove)
-	    molsShow.keepOnlySelected()
-	    if(!toRemove.isEmpty){
-	      val saver = new BrightStatSaver(bs, Main.movieFile)
-	      saver.rewriteMoleculeReports()
+	    val nMolsOriginal = bs.nMolecules
+	    toRemove.length match{
+	      case 0 => Dialog.showMessage(Main.movieWidget.movieScreen, "All the molecules are selected, resaving is pointless", "Resaving not done")
+	      case `nMolsOriginal` => Dialog.showMessage(Main.movieWidget.movieScreen, "No molecules are selected, resaving would destroy all information", "Resaving not done")
+	      case _ =>
+		    bs.removeMolecules(toRemove)
+		    molsShow.keepOnlySelected()
+		    val saver = new BrightStatSaver(bs, Main.movieFile)
+		    saver.rewriteMoleculeReports()
+		    Main.movieWidget.movieScreen.repaint()
 	    }
 	  }
 	}
