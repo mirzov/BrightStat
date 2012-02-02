@@ -13,20 +13,25 @@ class BrightStatCalculator(movie: Movie, pars: PPars, progressCallBack: Int => U
 		var molStats = movie.detectMoleculesFromScratch(pars, cancelled, progressCallBack)
 		var f = pars.startFrame + pars.NofStartFrames - 1
 		brightStat.addMolStats(molStats, f)
+		addExSignal(f);	addEmSignal(f)
+		
+		def addExSignal(f: Int) =
+			if(pars.exRoi != NoROI){
+				val sig = movie.getFrame(f).calcSumInRoi(pars.exRoi)
+				brightStat.addExSignal(sig, f)
+			}
+		  
+		def addEmSignal(f: Int) = 
+		  if(pars.emRoi != NoROI){
+				val sig = movie.getFrame(f).calcSumInRoi(pars.emRoi)
+				brightStat.addEmSignal(sig, f)
+			}
 		
 		def processFrame(f: Int){
 			progressCallBack(f)
-			val frame = movie.getFrame(f)
-			molStats = frame.followMolecules(molStats, pars)
+			molStats = movie.getFrame(f).followMolecules(molStats, pars)
 			brightStat.addMolStats(molStats, f)
-			if(pars.exRoi != NoROI){
-				val sig = frame.calcSumInRoi(pars.exRoi)
-				brightStat.addExSignal(sig, f)
-			}
-			if(pars.emRoi != NoROI){
-				val sig = frame.calcSumInRoi(pars.emRoi)
-				brightStat.addEmSignal(sig, f)
-			}
+			addExSignal(f); addEmSignal(f)
 		}
 		
 		val startFrameMolStats = molStats

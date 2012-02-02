@@ -19,7 +19,10 @@ class BrightStatTests extends JUnitSuite{
 	@Test def improveSignalsTest(){
 		val sigs = Array.fill(30)(-0.1d)
 		sigs(10) = 10; sigs(11) = 10
-		val improved = improveSignals(sigs).zipWithIndex.filter(_._1 > 0).map(_._2)
+		val improvedArray = improveSignals(sigs)
+		assert(improvedArray.length === sigs.length)
+		
+		val improved = improvedArray.zipWithIndex.filter(_._1 > 0).map(_._2)
 		assertArrayEquals(Array(10, 11), improved)
 	}
 	
