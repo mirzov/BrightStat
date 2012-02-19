@@ -35,7 +35,6 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 		paintLabels = true
 		paintTicks = true
 		paintTrack = true
-		majorTickSpacing = 10
 	}
 	
 	private var frame = 1
@@ -63,6 +62,11 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 		currentFrame = 1
 		movieSlider.max = movie.Nframes
 		movieSlider.value = 1
+		movieSlider.minorTickSpacing = (movie.Nframes / 10).max(1) 
+		movieSlider.majorTickSpacing = movieSlider.minorTickSpacing * 2
+		//println("Tick spacing = " + movieSlider.majorTickSpacing)
+		//println("Nframes = " + movie.Nframes)
+	  	movieScreen.repaint()
 	}
 
 	def toReady(){
