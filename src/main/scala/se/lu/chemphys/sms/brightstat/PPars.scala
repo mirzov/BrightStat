@@ -9,7 +9,7 @@ class PPars {
 	var BrightSize = 2.24f
 	var NofStartFrames = 10
 	var CutOff = 0.3f
-	var NoiseSigms = 3f
+	var NoiseSigms = 0f
 	var Correlation = 0.6f
 	var UseExProfile = false
 	var Normalize = false
