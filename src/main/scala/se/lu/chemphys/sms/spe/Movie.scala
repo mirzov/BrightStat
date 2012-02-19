@@ -40,20 +40,25 @@ trait Movie{
 			for((pix, occurence) <- mols){
 				val newPix = frame.shiftToLocalMax(pix)
 				if(areSame(pix, newPix) && frame.isMolecule(newPix, pars)) {
-					//println("Detected mol " + pix + " in the spot " + newPix)
+					//println("Confirmed mol " + pix + " in the spot " + newPix)
 					newMols += ((newPix, occurence + 1))
 				}
-				else if(occurence > 0) newMols += ((pix, occurence))
+				else if(occurence > 0) {
+					newMols += ((pix, occurence))
+					//println("Kept previously confirmed mol " + pix)
+				}
 			}
 			maxs = frame.detectLocalMaxs(pars)
 			val freshmols = frame.detectMolecules(maxs, pars)
 			for(freshmol <- freshmols if !newMols.exists(mol => areSame(mol._1, freshmol))){
 				newMols += ((freshmol, 0))
+				//println("Added new mol " + freshmol)
 			}
 			mols = newMols
 			f += 1
 		}
 		val molPixels = mols.filter(_._2 > 0).map(_._1)
+		//println("Detected molPixels:" + molPixels.mkString(", "))
 		if(!isCancelled) frame.markBrightNonMolecules(maxs, pars)
 		frame.calcSignals(molPixels, pars, true)
 	}

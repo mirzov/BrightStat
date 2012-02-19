@@ -59,6 +59,23 @@ class MovieTests extends BrightStatSuite{
 //		gotCoords.foreach(c => println(c._1 + "\t" + c._2))
 	}
 	
+	@Test def moreInitFramesMoreMoleculesTest(){
+		def detectedCoords(nInitFrames: Int): Seq[(Int, Int)] = {
+			val pars = getPars(10)
+			pars.NoiseSigms = 0f
+			pars.roi = ROI(48, 193, 75, 233)
+			pars.UseROI = true
+			val detected = uint16.detectMoleculesFromScratch(pars)
+			detected.map(stat => (stat.x, stat.y))
+		}
+		val anExpectedMol = (69,212)
+		val detected10 = detectedCoords(10)
+		val detected30 = detectedCoords(30)
+		assertTrue(detected10.contains(anExpectedMol))
+		assertTrue(detected30.contains(anExpectedMol))
+		assertTrue(detected30.size >= detected10.size)
+	}
+	
 	@Test def brightStatCalculationTest(){
 		val pars = getPars(10)
 		//pars.roi = ROI(44, 155, 68, 172)	// small roi
