@@ -59,7 +59,7 @@ trait Movie{
 		}
 		val molPixels = mols.filter(_._2 > 0).map(_._1)
 		//println("Detected molPixels:" + molPixels.mkString(", "))
-		if(!isCancelled) frame.markBrightNonMolecules(maxs, pars)
+		//if(!isCancelled) frame.markBrightNonMolecules(maxs, pars)
 		frame.calcSignals(molPixels, pars, true)
 	}
 

@@ -194,7 +194,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	def followMolecules(mols: Array[MolStat], pars: PPars): Array[MolStat] = {
 		val maxs = detectLocalMaxs(pars)
 		detectMolecules(maxs, pars)
-		markBrightNonMolecules(maxs, pars)
+		//markBrightNonMolecules(maxs, pars)
 		val newCoords = mols.map { mol =>
 			val coord = (mol.x, mol.y)
 			val newCoord = shiftToLocalMax(coord)
