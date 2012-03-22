@@ -3,7 +3,7 @@ package se.lu.chemphys.sms.brightstat.tests
 import se.lu.chemphys.sms.spe.Utils
 import se.lu.chemphys.sms.brightstat._
 import se.lu.chemphys.sms.spe.Movie
-import org.junit.Test
+import org.junit._
 import org.junit.Assert._
 import scala.io.Source
 import se.lu.chemphys.sms.brightstat.ui.BrightStatCalculator
@@ -45,7 +45,7 @@ class MovieTests extends BrightStatSuite{
 		assertEquals(0, mismatches.size)
 	}
 
-	@Test def detectMoleculesFromScratchTest(){
+	@Ignore @Test def detectMoleculesFromScratchTest(){
 		molDetectionTest(10)
 //		val pars = getPars(10)
 //		pars.roi = ROI(85, 153, 92, 159)
@@ -59,7 +59,7 @@ class MovieTests extends BrightStatSuite{
 //		gotCoords.foreach(c => println(c._1 + "\t" + c._2))
 	}
 	
-	@Test def moreInitFramesMoreMoleculesTest(){
+	@Ignore @Test def moreInitFramesMoreMoleculesTest(){
 		def detectedCoords(nInitFrames: Int): Seq[(Int, Int)] = {
 			val pars = getPars(10)
 			pars.NoiseSigms = 0f
@@ -76,7 +76,7 @@ class MovieTests extends BrightStatSuite{
 		assertTrue(detected30.size >= detected10.size)
 	}
 	
-	@Test def brightStatCalculationTest(){
+	@Ignore @Test def brightStatCalculationTest(){
 		val pars = getPars(10)
 		//pars.roi = ROI(44, 155, 68, 172)	// small roi
 		pars.roi = ROI(34, 149, 80, 179) 	// medium roi
