@@ -39,13 +39,12 @@ class MovieTests extends BrightStatSuite{
 		}
 		val gotCoords = detected.map(stat => (stat.x + 1, stat.y + 1)).toArray
 		//gotCoords.foreach(c => println(c._1 + "\t" + c._2))
-		assertEquals(expectedCoords.size, gotCoords.size)
-		val mismatches = gotCoords.zip(expectedCoords).filter(p => p._1 != p._2)
+		val mismatches = expectedCoords diff gotCoords
 		mismatches foreach println
 		assertEquals(0, mismatches.size)
 	}
 
-	@Ignore @Test def detectMoleculesFromScratchTest(){
+	@Test def detectMoleculesFromScratchTest(){
 		molDetectionTest(10)
 //		val pars = getPars(10)
 //		pars.roi = ROI(85, 153, 92, 159)
