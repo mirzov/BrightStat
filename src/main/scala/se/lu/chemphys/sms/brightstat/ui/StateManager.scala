@@ -52,7 +52,7 @@ class StateManager extends SwingWorker {
 					case "cancel" => calculator.cancelled = true; ready()
 					case "quit" => calculator.cancelled = true; quit()
 					case result: BrightStat => 
-					  	new BrightStatSaver(result, movieFile).save()
+					  	new BrightStatSaver(result, movieFile).save(pars.ImproveSignals)
 					  	movieWidget.currentFrame = pars.startFrame
 					  	movie.brightStat = Some(result)
 					  	ready()

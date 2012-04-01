@@ -71,12 +71,15 @@ trait BrightStat {
 		printCoordinatesReport(minFrame, out)
 	}
 	
-	private def printSignalsReport(out: PrintStream, silo:TreeMap[Int, Double]){
+	private def printSignalsReport(out: PrintStream, silo:TreeMap[Int, Double], improve: Boolean){
 		import BrightStat._
-		if(!silo.isEmpty) improveSignals(silo.values.toArray).foreach(d => out.println(doubleToString(d)))
+		if(!silo.isEmpty){
+			val sigs = if(improve) improveSignals(silo.values.toArray) else silo.values.toArray
+			sigs.foreach(d => out.println(doubleToString(d)))
+		}
 	}
-	def printExSignalsReport(out: PrintStream) = printSignalsReport(out, exSignalsSilo)
-	def printEmSignalsReport(out: PrintStream) = printSignalsReport(out, emSignalsSilo)
+	def printExSignalsReport(out: PrintStream, improve: Boolean) = printSignalsReport(out, exSignalsSilo, improve)
+	def printEmSignalsReport(out: PrintStream, improve: Boolean) = printSignalsReport(out, emSignalsSilo, improve)
 	
 	def removeMolecules(nums: Seq[Int]){
 	  molStatsSilo = molStatsSilo.map{ pair =>

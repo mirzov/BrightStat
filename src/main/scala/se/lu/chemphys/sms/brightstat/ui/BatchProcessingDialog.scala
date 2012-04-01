@@ -63,7 +63,7 @@ class BatchProcessingDialog(pars: PPars, files: Seq[File], owner: Window) extend
 			loopWhile(!activeCalcs.isEmpty){
 				react{
 					case (bs: BrightStat, file: File) => 
-						new BrightStatSaver(bs, Some(file)).save()
+						new BrightStatSaver(bs, Some(file)).save(pars.ImproveSignals)
 						if(!fileQueue.isEmpty) scheduleProcessing(fileQueue.dequeue)
 						if(activeCalcs.isEmpty) close()
 					case "cancel" => activeCalcs.foreach{_.cancelled = true}; close()

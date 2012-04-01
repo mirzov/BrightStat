@@ -19,6 +19,7 @@ class PParsDialog(owner: Window) extends Dialog(owner) {
 		("CutOff", 			"Excitation cutoff")
 	)
 	private val checkBoxLabels = Set(
+		("ImproveSignals", 	"Improve the excitation/emission signals"),
 		("UseExProfile", 	"Use excitation profile"),
 		("Normalize",		"Normalize by excitation")
 //		("UseROI",			"Use ROI")
