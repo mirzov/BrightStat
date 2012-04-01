@@ -3,6 +3,7 @@ package se.lu.chemphys.sms.brightstat
 import java.io.PrintStream
 import scala.collection.immutable.TreeMap
 import scala.collection.mutable.ArrayBuffer
+import java.util.Locale
 
 trait BrightStat {
 
@@ -37,11 +38,13 @@ trait BrightStat {
 		emSignalsSilo += ((frame, signal))
 	}
 	
+	private def doubleToString(d: Double) = String.format(Locale.US, "%.2f", d.asInstanceOf[java.lang.Double])
+		
 	private def printAnyIntensityReport(out: PrintStream, toIntens: MolStat => Double){
 		out.println("Frame\tMol" + (1 to nMolecules).mkString("\tMol"))
 		for((k, v) <- molStatsSilo){
 			out.print(k.toString + "\t")
-			out println v.map(molstat => toIntens(molstat).formatted("%.2f")).mkString("\t")
+			out println v.map(molstat => doubleToString(toIntens(molstat))).mkString("\t")
 		}
 	}
 	def printIntensityReport(out: PrintStream) = printAnyIntensityReport(out, _.I)
@@ -68,12 +71,15 @@ trait BrightStat {
 		printCoordinatesReport(minFrame, out)
 	}
 	
-	private def printSignalsReport(out: PrintStream, silo:TreeMap[Int, Double]){
+	private def printSignalsReport(out: PrintStream, silo:TreeMap[Int, Double], improve: Boolean){
 		import BrightStat._
-		if(!silo.isEmpty) improveSignals(silo.values.toArray).foreach(out.println(_))
+		if(!silo.isEmpty){
+			val sigs = if(improve) improveSignals(silo.values.toArray) else silo.values.toArray
+			sigs.foreach(d => out.println(doubleToString(d)))
+		}
 	}
-	def printExSignalsReport(out: PrintStream) = printSignalsReport(out, exSignalsSilo)
-	def printEmSignalsReport(out: PrintStream) = printSignalsReport(out, emSignalsSilo)
+	def printExSignalsReport(out: PrintStream, improve: Boolean) = printSignalsReport(out, exSignalsSilo, improve)
+	def printEmSignalsReport(out: PrintStream, improve: Boolean) = printSignalsReport(out, emSignalsSilo, improve)
 	
 	def removeMolecules(nums: Seq[Int]){
 	  molStatsSilo = molStatsSilo.map{ pair =>
@@ -86,52 +92,7 @@ trait BrightStat {
 }
 
 object BrightStat{
-	import scala.math.{abs, sqrt, min}
 	
-	def getStepStat(sigs: Array[Double]): (Double, Double) = {
-		val n = sigs.length
-		assert(n > 1, "There must be at least 2 signal values to calculate step statistics.")
-		val steps = sigs.sliding(2).map(arr => abs(arr(0) - arr(1))).toArray
-		val aver = steps.sum / (n - 1)
-		val sqAver = steps.map(step => step * step).sum / (n - 1)
-		val std = sqrt(sqAver - aver * aver)
-		(aver, std)
-	}
-  
-	def improveSignals(sigs: Array[Double]): Array[Double] = {
-	   val (stepAver, stepStd) = getStepStat(sigs)
-	   var N = sigs.length
-	   var starts = new ArrayBuffer[Int](); var stops = new ArrayBuffer[Int]()
-	   var i = 0; var j = 0
-	   while(i < N-1)
-	   {
-	      if(sigs(i+1) - sigs(i) > stepAver + 2.5 * stepStd)
-	      {
-	    	  j = i
-	          while(sigs(j+1) > sigs(j) && j >= 0) {j -= 1}
-	          starts += (if(j>=0) j + 1 else 0)
-	          while(sigs(i+1) > sigs(i) && i < N-1){i += 1}
-	      }
-	      if(sigs(i) - sigs(i+1) > stepAver + 2.5 * stepStd)
-	      {
-	    	  j = i
-	          while(sigs(j+1) < sigs(j) && j < N-1){j += 1}
-	          if(j < N-1) {stops += j }
-	          i=j
-	      }
-	      if(stops.length == starts.length - 1) stops += (N - 1)
-	      i += 1
-	   }
-	   j = 0; var subtr = 0d; i = 0
-	   val improved = sigs.clone
-	   while(i < starts.length)
-	   {
-	       while(j < starts(i)){improved(j)=0; j += 1};
-	       subtr = min(improved(starts(i)), improved(stops(i)))
-	       while(j <= stops(i)){improved(j) -= subtr; j += 1}
-	       i += 1
-	   }
-	   while(j < N) {improved(j) = 0; j += 1}
-	   improved
-	}
+	def improveSignals(sigs: Array[Double]): Array[Double] = SignalsImprover.improveSignalsSimple(sigs)
+	
 }

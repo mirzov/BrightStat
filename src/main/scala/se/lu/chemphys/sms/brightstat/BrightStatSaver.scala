@@ -12,13 +12,13 @@ class BrightStatSaver(brightStat: BrightStat, moviePath: Option[File]) {
 		stream.close
 	}
 	
-	def save(){
+	def save(improveSignals: Boolean){
 		for(mPath <- moviePath){
 			val resFolder = getOutputFolder(mPath)
 			resFolder.mkdir
 			printMoleculeReports(mPath)
-			printReport(new File(resFolder, "SignalsEx.txt"), _.printExSignalsReport)
-			printReport(new File(resFolder, "SignalsEm.txt"), _.printEmSignalsReport)
+			printReport(new File(resFolder, "SignalsEx.txt"), bs => bs.printExSignalsReport(_, improveSignals))
+			printReport(new File(resFolder, "SignalsEm.txt"), bs => bs.printEmSignalsReport(_, improveSignals))
 		}
 	}
 	

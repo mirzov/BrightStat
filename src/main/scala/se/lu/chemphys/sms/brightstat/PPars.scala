@@ -9,11 +9,12 @@ class PPars {
 	var BrightSize = 2.24f
 	var NofStartFrames = 10
 	var CutOff = 0.3f
-	var NoiseSigms = 0f
+	var NoiseSigms = 2.5f
 	var Correlation = 0.6f
 	var UseExProfile = false
 	var Normalize = false
 	var UseROI = false
+	var ImproveSignals = true
 	var ExFrame: Frame[Double] = _
 	var roi: ROI = NoROI
 	var exRoi: ROI = NoROI
@@ -49,6 +50,7 @@ class PPars {
 	}
 	
 	def getBooleanValue(varName: String): Boolean = varName match{
+		case "ImproveSignals" => ImproveSignals
 		case "Normalize" => Normalize
 		case "UseExProfile" => UseExProfile
 		case "UseROI" => UseROI
@@ -68,6 +70,7 @@ class PPars {
 	}
 
 	def setBooleanValue(varName: String, value: Boolean) = varName match{
+		case "ImproveSignals" => ImproveSignals = value
 		case "Normalize" => Normalize = value
 		case "UseExProfile" => UseExProfile = value
 		case "UseROI" => UseROI = value

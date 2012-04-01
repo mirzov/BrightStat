@@ -62,10 +62,13 @@ class MovieWidget(movie: => Movie, state: StateManager) extends StatefulUiCompon
 		currentFrame = 1
 		movieSlider.max = movie.Nframes
 		movieSlider.value = 1
-		movieSlider.minorTickSpacing = (movie.Nframes / 10).max(1) 
-		movieSlider.majorTickSpacing = movieSlider.minorTickSpacing * 2
-		//println("Tick spacing = " + movieSlider.majorTickSpacing)
-		//println("Nframes = " + movie.Nframes)
+		val step = (movie.Nframes / 10).max(1)
+		movieSlider.majorTickSpacing = step
+		movieSlider.labels = Map((1 to movie.Nframes by step).map{n => (n, new Label(n.toString))}:_*)
+		//movieSlider.minorTickSpacing = (movie.Nframes / 10).max(1)
+		
+		println("Tick spacing = " + movieSlider.majorTickSpacing)
+		println("Nframes = " + movie.Nframes)
 	  	movieScreen.repaint()
 	}
 
