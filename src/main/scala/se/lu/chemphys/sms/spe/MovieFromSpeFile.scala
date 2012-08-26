@@ -43,11 +43,11 @@ class MovieFromSpeFile(filePath: String) extends Movie {
 
 	val frameLength: Int = XDim * YDim * dataLength
 	
-	private val cache = new WeakHashMap[Int, Frame[_]]()
+	//private val cache = new WeakHashMap[Int, Frame[_]]()
 	
 	def getFrame(n: Int): Frame[_] = {
 	  //println("Getting frame " + n)
-		val frame = cache.getOrElseUpdate(n, getNewFrame(n))
+		val frame = getNewFrame(n)//cache.getOrElseUpdate(n, getNewFrame(n))
 		frame.resetMarks()
 		frame
 	}
