@@ -10,7 +10,7 @@ object Utils {
 		var i = 0;
 		val imax = array.length
 		while(i < imax){
-			array(i) = (shorts(i*2) & 0x00ff) | (shorts(i*2+1) << 8)
+			array(i) = (shorts(i*2) & 0x00ff) | ((shorts(i*2+1) & 0x00ff) << 8)
 			i = i + 1
 		}
 		array
