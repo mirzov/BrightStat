@@ -70,7 +70,7 @@ class Frame[T](val XDim: Int, val YDim: Int, protected val data: Array[T])(impli
 	
 	def getBrightCluster(i: Int, j: Int, number: Int): Set[(Int, Int)] = {
 		def addNext(seed: Set[(Int, Int)]): Set[(Int, Int)] = {
-			var maxInt = min
+			var maxInt = min - num.fromInt(1)
 			var maxCoord: (Int, Int) = null
 			for(pix <- seed){
 				for(m <- (pix._1 - 1) to (pix._1 + 1); n <- (pix._2 - 1) to (pix._2 + 1) if(withinRange(m, n))){
